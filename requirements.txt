@@ -1,0 +1,7 @@
+imutils
+numpy
+pyautogui
+cmake
+dlib
+cv2
+playsound
