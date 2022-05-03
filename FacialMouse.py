@@ -62,6 +62,129 @@ class FacialMouse():
 
         # Mouse Control object
         self.mouse_control = MouseControls(35 + sensitivity, 60)
+
+        def setFrame(self, frame):
+            frame = cv2.flip(imutils.resize(frame, width=cam_w, height=cam_h), 1)
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+            # Detect faces in the grayscale frame
+            rects = self.detector(gray, 0)
+
+            # If Face detected, set faceDetected as true
+            if len(rects) > 0:
+                rect = rects[0]
+                self.faceDetected = True
+
+            else:
+                self.faceDetected = False
+                return frame
+            
+            # increment the frame counter
+            self.frame_ctr += 1
+
+            # Determine the facial landmarks for the face region, then convert the facial landmark (x, y)-coordinates to a NumPy array
+            shape = self.predictor(gray, rect)
+            shape = face_utils.shape_to_np(shape)
+
+            # Extract the left and right eye coordinates
+            coordinates = self.extract_coordinates(shape)
+            leftEye, rightEye, leftBrow, rightBrow, nose = coordinates
+
+            # use the coordinates to compute the eye aspect ratio for both eyes
+            leftEAR = self.eye_aspect_ratio(leftEye)
+            rightEAR = self.eye_aspect_ratio(rightEye)
+            ear = (leftEAR + rightEAR) / 2.0
+
+            nose_point = (nose[3, 0], nose[3, 1])
+
+            # Mark the Landmarks
+            self.mark_landmarks(coordinates, frame)
+
+            # if Eye is opened 
+            if ear > EYE_AR_LIFT_THRESH:
+                eyebrow_lifted = self.eyebrow_lift_ratio(leftEye, leftBrow, rightEye, rightBrow)
+                
+                # If eye is open and the eyebrow was lifted 
+                if eyebrow_lifted > EYEBROW_THRESH:
+                    self.eyebrow_lift_ctr += 1
+                    if self.eyebrow_lift_ctr == EYEBROW_LIFT_FRAMES:
+                        self.scroll = True
+                    if self.eyebrow_lift_ctr == LONG_EYEBROW_LIFT_FRAMES:
+                        self.input_mode = not self.input_mode
+                        self.anchor_point = nose_point
+                        self.scroll = False
+                else:
+                    self.eyebrow_lift_ctr = 0
+                    if self.scroll:
+                        if self.scroll_mode:
+                            self.scroll_mode = False
+                        elif self.input_mode:
+                            self.scroll_mode = True
+                    self.scroll = False
+                        
+            else:
+                self.eyebrow_lift_ctr = 0
+                if self.scroll:
+                    if self.scroll_mode:
+                        self.scroll_mode = False
+                    elif self.input_mode:
+                        self.scroll_mode = True
+                self.scroll = False
+
+            # If eye is closed
+            if ear < EYE_AR_THRESH and self.input_mode:
+                self.eye_closed_ctr += 1
+                
+                if self.eye_closed_ctr == SHORT_BLINK_FRAMES:
+                    self.leftClick = True
+                    
+                if self.eye_closed_ctr == LONG_BLINK_FRAMES:
+                    self.leftClick = False
+                    self.mouse_control.click("right")
+                    # _Debug_
+                    print("Right Click")
+                    self.eye_closed_ctr = 0
+            else:
+                if self.leftClick:
+                    self.mouse_control.click("left")
+                    # _Debug_
+                    print("Left Click")
+                    self.leftClick = False
+                self.eye_closed_ctr = 0
+
+            if self.input_mode:
+                # _Debug_
+                self.show_debug_texts(frame, "READING INPUT!", (20, 750), GREEN_COLOR)
+                self.show_debug_texts(frame, f"{'' if self.eyebrow_lift_ctr == 0 else self.eyebrow_lift_ctr}", (20, 780), GREEN_COLOR)
+
+                x, y = self.anchor_point
+                w, h = 40, 25
+
+                # Draw box around nose
+                cv2.rectangle(frame, (x - w, y - h), (x + w, y + h), RED_COLOR, 2)
+                cv2.line(frame, self.anchor_point, nose_point, YELLOW_COLOR, 2)
+
+                _direction = self.direction(nose_point, self.anchor_point, w, h)
+                # _Debug_
+                self.show_debug_texts(frame, _direction.upper(), (600, 750), RED_COLOR)
+
+                if self.scroll_mode:
+                    self.mouse_control.scrollVertically(_direction)
+                else:
+                    self.mouse_control.moveMouse(_direction)
+
+            else:
+                self.scroll_mode = False
+                # _Debug_
+                self.show_debug_texts(frame, "INPUT MODE OFF", (20, 750), RED_COLOR)
+                self.show_debug_texts(frame, f"LIFT YOUR EYEBROWS FOR 3s TO TURN ON. {'' if self.eyebrow_lift_ctr == 0 else self.eyebrow_lift_ctr}", (20, 780), RED_COLOR)
+                
+            if self.scroll_mode:
+                # _Debug_
+                self.show_debug_texts(frame, "SCROLL MODE ON", (300, 750), GREEN_COLOR)
+
+            return frame
+
     
 
     # utility functions
