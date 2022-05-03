@@ -3,5 +3,6 @@ numpy
 pyautogui
 cmake
 dlib
-cv2
+opencv-python
 playsound
+PyQt5
