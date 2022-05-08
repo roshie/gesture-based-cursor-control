@@ -13,11 +13,13 @@ class Thread(QThread):
     def __init__(self, window, mouseSensitivity) -> None:
         super().__init__(window)
         self.mouseSensitivity = mouseSensitivity
+        self.input_mode = False
 
     def run(self):
         self.cap = cv2.VideoCapture(0)
         
         facial_mouse = FacialMouse(self.mouseSensitivity)
+        self.input_mode = facial_mouse.input_mode
         
         while True:
             ret, frame = self.cap.read()
@@ -28,7 +30,7 @@ class Thread(QThread):
                 h, w, ch = rgbImage.shape
                 bytesPerLine = ch * w
                 convertToQtFormat = QImage(rgbImage.data, w, h, bytesPerLine, QImage.Format_RGB888)
-                p = convertToQtFormat.scaled(640, 480, Qt.KeepAspectRatio)
+                p = convertToQtFormat.scaled(750, 750, Qt.KeepAspectRatio)
                 self.changePixmap.emit(p)
                 
     def __del__(self):
