@@ -5,3 +5,4 @@ cmake
 opencv-python
 playsound
 PyQt5
+qt-material
