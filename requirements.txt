@@ -2,7 +2,6 @@ imutils
 numpy
 pyautogui
 cmake
-dlib
 opencv-python
 playsound
 PyQt5
