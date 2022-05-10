@@ -1,5 +1,5 @@
 import pyautogui as pyag
-from playsound import playsound
+from pygame import mixer
 
 # Import Click sound
 clickSound = 'sounds/MouseClick.mp3'
@@ -8,6 +8,7 @@ class MouseControls():
     def __init__(self, drag, scrollOffset):
         self.drag = drag # values - 40 to 50
         self.scrollOffset = scrollOffset
+        mixer.init()
         
     def moveMouse(self, direction: str):
         if direction == 'right':
@@ -31,4 +32,5 @@ class MouseControls():
 
     def click(self, button: str):
         pyag.click(button=button)
-        # playsound(clickSound)
+        mixer.music.load(clickSound)
+        mixer.music.play()

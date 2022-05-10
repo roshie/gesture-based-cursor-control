@@ -202,8 +202,8 @@ class CamWindow(QWidget):
         
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    # intro = IntroWindow()
+    intro = IntroWindow()
     # Debug
-    camwindow = CamWindow(10)
+    # camwindow = CamWindow(10)
     apply_stylesheet(app, theme='dark_teal.xml', extra={'density_scale': '5'})
     sys.exit(app.exec_())
