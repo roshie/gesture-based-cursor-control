@@ -4,6 +4,7 @@ from PyQt5.QtCore import pyqtSlot, Qt, QRect
 from PyQt5.QtGui import QImage, QPixmap, QFont
 from VideoStreamThread import Thread
 from qt_material import apply_stylesheet
+from helpWindow import HelpWindow
 
 class IntroWindow(QWidget):
     def __init__(self):
@@ -134,6 +135,9 @@ class CamWindow(QWidget):
             self.eyebrowLiftPercent.setText('')
         else:
             self.eyebrowLiftPercent.setText(str(val) + '%')
+    def openHelp(self):
+        self.helpWindow = HelpWindow()
+        self.helpWindow.show()     
 
     def initUI(self):
         self.setWindowTitle(self.title)
@@ -182,6 +186,7 @@ class CamWindow(QWidget):
 
         # Buttons row
         helpbtn = QPushButton("Help?", self)
+        helpbtn.clicked.connect(self.openHelp)
         helpbtn.setStyleSheet("font-size: 25px;")
         closeBtn = QPushButton("Close", self)
         closeBtn.setStyleSheet("font-size: 25px;")
@@ -220,5 +225,6 @@ if __name__ == '__main__':
     intro = IntroWindow()
     # Debug
     # camwindow = CamWindow(10)
+    # helpWindow = HelpWindow()
     apply_stylesheet(app, theme='dark_teal.xml', extra={'density_scale': '5'})
     sys.exit(app.exec_())
