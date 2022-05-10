@@ -5,21 +5,30 @@ from PyQt5.QtWidgets import  QWidget, QLabel, QApplication
 from PyQt5.QtCore import QThread, Qt, pyqtSignal, pyqtSlot
 from PyQt5.QtGui import QImage, QPixmap
 from FacialMouse import FacialMouse
+from Notifier import Notifier
 
-class Thread(QThread):
+class Thread(QThread, Notifier):
     changePixmap = pyqtSignal(QImage)
     mouseSensitivity = 5
 
     def __init__(self, window, mouseSensitivity) -> None:
         super().__init__(window)
         self.mouseSensitivity = mouseSensitivity
-        self.input_mode = False
+
+    def changInputMode(self, val):
+        self.changeInputMode(val)
+
+    def changScrollMode(self, val):
+        self.changeScrollMode(val)
+
+    def updatPercentage(self, val):
+        self.updatePercentage(val)
 
     def run(self):
         self.cap = cv2.VideoCapture(0)
         
         facial_mouse = FacialMouse(self.mouseSensitivity)
-        self.input_mode = facial_mouse.input_mode
+        facial_mouse.attach(self)
         
         while True:
             ret, frame = self.cap.read()

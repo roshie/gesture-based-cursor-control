@@ -121,6 +121,20 @@ class CamWindow(QWidget):
         self.intro = IntroWindow()
         self.intro.show()
 
+    def changInputMode(self, val):
+        self.inputStatus.setText("OFF" if not val else "ON")
+        self.inputStatus.setStyleSheet(f"color: {'red' if not val else 'green'}; font-size: 40px;")
+
+    def changScrollMode(self, val):
+        self.scrollStatus.setText("OFF" if not val else "ON")
+        self.scrollStatus.setStyleSheet(f"color: {'red' if not val else 'green'}; font-size: 40px;")
+
+    def updatPercentage(self, val):
+        if val == 0:
+            self.eyebrowLiftPercent.setText('')
+        else:
+            self.eyebrowLiftPercent.setText(str(val) + '%')
+
     def initUI(self):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
@@ -130,21 +144,22 @@ class CamWindow(QWidget):
         self.imageLabel.resize(800, 800)
         self.videoStreamThread = Thread(self, self.CursorSensitivity)
         self.videoStreamThread.changePixmap.connect(self.setImage)
+        self.videoStreamThread.attach(self)
         self.videoStreamThread.start()
 
-        eyebrowLiftPercent = QLabel(f"{'' if not self.percentile else str(self.percentile) + '%'}")
-        eyebrowLiftPercent.setStyleSheet("font-size: 30px;")
+        self.eyebrowLiftPercent = QLabel("")
+        self.eyebrowLiftPercent.setStyleSheet("font-size: 30px;")
 
         # input mode
         inputModeLabel = QLabel("INPUT MODE: ")
         inputModeLabel.setStyleSheet("font-size: 30px;")
 
-        inputStatus = QLabel(f"{'ON' if self.inputMode else 'OFF'}")
-        inputStatus.setStyleSheet(f"color: {'green' if self.inputMode else 'red'}; font-size: 40px;")
+        self.inputStatus = QLabel("OFF")
+        self.inputStatus.setStyleSheet(f"color: red; font-size: 40px;")
 
         inputModeRow = QHBoxLayout()
         inputModeRow.addWidget(inputModeLabel)
-        inputModeRow.addWidget(inputStatus)
+        inputModeRow.addWidget(self.inputStatus)
         inputModeRowWrapper = QLabel()
         inputModeRowWrapper.setLayout(inputModeRow)
 
@@ -156,12 +171,12 @@ class CamWindow(QWidget):
         scrollModeLabel = QLabel("SCROLL MODE: ")
         scrollModeLabel.setStyleSheet("font-size: 30px;")
 
-        scrollStatus = QLabel(f"{'ON' if self.scrollMode else 'OFF'}")
-        scrollStatus.setStyleSheet(f"color: {'green' if self.scrollMode else 'red'}; font-size: 40px;")
+        self.scrollStatus = QLabel('OFF')
+        self.scrollStatus.setStyleSheet("color: red; font-size: 40px;")
 
         scrollModeRow = QHBoxLayout()
         scrollModeRow.addWidget(scrollModeLabel)
-        scrollModeRow.addWidget(scrollStatus)
+        scrollModeRow.addWidget(self.scrollStatus)
         scrollModeRowWrapper = QLabel()
         scrollModeRowWrapper.setLayout(scrollModeRow)
 
@@ -184,7 +199,7 @@ class CamWindow(QWidget):
         buttonsRowWrapper.setLayout(buttonsRow)
         
         leftCell = QVBoxLayout()
-        leftCell.addWidget(eyebrowLiftPercent)
+        leftCell.addWidget(self.eyebrowLiftPercent)
         leftCell.addWidget(inputModeRowWrapper)
         leftCell.addWidget(inputModeHelperText)
         leftCell.addWidget(scrollModeRowWrapper)

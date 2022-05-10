@@ -4,6 +4,7 @@ import imutils
 import dlib
 import cv2
 from MouseControls import MouseControls
+from Notifier import Notifier
 
 # Model
 SHAPE_PREDICTOR = "shape_predictor_68_face_landmarks.dat"
@@ -39,10 +40,12 @@ cam_h = 720
 unit_w = resolution_w / cam_w
 unit_h = resolution_h / cam_h
 
-class FacialMouse():
+class FacialMouse(Notifier):
     """ @param sensitivity: int - Mouse sensitivity {0 - 15} """
 
     def __init__(self, sensitivity=5):
+        self._observers = []
+
         # Initialize counters
         self.eyebrow_lift_ctr = 0
         self.eye_closed_ctr = 0
@@ -56,12 +59,23 @@ class FacialMouse():
         self.scroll_mode = False
         self.faceDetected = False
 
-        # COG and Linear SVM supported face detector
+        # HOG and Linear SVM supported face detector
         self.detector = dlib.get_frontal_face_detector()
         self.predictor = dlib.shape_predictor(SHAPE_PREDICTOR)
 
         # Mouse Control object
         self.mouse_control = MouseControls(35 + sensitivity, 60)
+
+    def setEyebrowLiftCtr(self):
+        self.updatePercentage(self.eyebrow_lift_ctr*10)
+
+    def toggleInputMode(self):
+        self.input_mode = not self.input_mode
+        self.changeInputMode(self.input_mode)
+
+    def toggleScrollMode(self, value:bool):
+        self.scroll_mode = value
+        self.changeScrollMode(self.scroll_mode)
 
     def setFrame(self, frame):
         frame = cv2.flip(imutils.resize(frame, width=cam_w, height=cam_h), 1)
@@ -74,7 +88,6 @@ class FacialMouse():
         if len(rects) > 0:
             rect = rects[0]
             self.faceDetected = True
-
         else:
             self.faceDetected = False
             return frame
@@ -107,28 +120,31 @@ class FacialMouse():
             # If eye is open and the eyebrow was lifted 
             if eyebrow_lifted > EYEBROW_THRESH:
                 self.eyebrow_lift_ctr += 1
+                self.setEyebrowLiftCtr()
                 if self.eyebrow_lift_ctr == EYEBROW_LIFT_FRAMES:
                     self.scroll = True
                 if self.eyebrow_lift_ctr == LONG_EYEBROW_LIFT_FRAMES:
-                    self.input_mode = not self.input_mode
+                    self.toggleInputMode()
                     self.anchor_point = nose_point
                     self.scroll = False
             else:
                 self.eyebrow_lift_ctr = 0
+                self.setEyebrowLiftCtr()
                 if self.scroll:
                     if self.scroll_mode:
-                        self.scroll_mode = False
+                        self.toggleScrollMode(False)
                     elif self.input_mode:
-                        self.scroll_mode = True
+                        self.toggleScrollMode(True)
                 self.scroll = False
                     
         else:
             self.eyebrow_lift_ctr = 0
+            self.setEyebrowLiftCtr()
             if self.scroll:
                 if self.scroll_mode:
-                    self.scroll_mode = False
+                    self.toggleScrollMode(False)
                 elif self.input_mode:
-                    self.scroll_mode = True
+                    self.toggleScrollMode(True)
             self.scroll = False
 
         # If eye is closed
@@ -154,8 +170,8 @@ class FacialMouse():
 
         if self.input_mode:
             # _Debug_
-            self.show_debug_texts(frame, "READING INPUT!", (20, 750), GREEN_COLOR)
-            self.show_debug_texts(frame, f"{'' if self.eyebrow_lift_ctr == 0 else self.eyebrow_lift_ctr}", (20, 780), GREEN_COLOR)
+            # self.show_debug_texts(frame, "READING INPUT!", (20, 750), GREEN_COLOR)
+            # self.show_debug_texts(frame, f"{'' if self.eyebrow_lift_ctr == 0 else self.eyebrow_lift_ctr}", (20, 780), GREEN_COLOR)
 
             x, y = self.anchor_point
             w, h = 40, 25
@@ -166,7 +182,7 @@ class FacialMouse():
 
             _direction = self.direction(nose_point, self.anchor_point, w, h)
             # _Debug_
-            self.show_debug_texts(frame, _direction.upper(), (600, 750), RED_COLOR)
+            # self.show_debug_texts(frame, _direction.upper(), (600, 750), RED_COLOR)
 
             if self.scroll_mode:
                 self.mouse_control.scrollVertically(_direction)
@@ -174,14 +190,15 @@ class FacialMouse():
                 self.mouse_control.moveMouse(_direction)
 
         else:
-            self.scroll_mode = False
+            self.toggleScrollMode(False)
             # _Debug_
-            self.show_debug_texts(frame, "INPUT MODE OFF", (20, 750), RED_COLOR)
-            self.show_debug_texts(frame, f"LIFT YOUR EYEBROWS FOR 3s TO TURN ON. {'' if self.eyebrow_lift_ctr == 0 else self.eyebrow_lift_ctr}", (20, 780), RED_COLOR)
+            # self.show_debug_texts(frame, "INPUT MODE OFF", (20, 750), RED_COLOR)
+            # self.show_debug_texts(frame, f"LIFT YOUR EYEBROWS FOR 3s TO TURN ON. {'' if self.eyebrow_lift_ctr == 0 else self.eyebrow_lift_ctr}", (20, 780), RED_COLOR)
             
         if self.scroll_mode:
+            pass
             # _Debug_
-            self.show_debug_texts(frame, "SCROLL MODE ON", (300, 750), GREEN_COLOR)
+            # self.show_debug_texts(frame, "SCROLL MODE ON", (300, 750), GREEN_COLOR)
 
         return frame
 
