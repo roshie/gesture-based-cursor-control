@@ -122,6 +122,10 @@ class CamWindow(QWidget):
         self.intro = IntroWindow()
         self.intro.show()
 
+    def openHelp(self):
+        self.helpWindow = HelpWindow()
+        self.helpWindow.show()     
+
     def initUI(self):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
@@ -168,6 +172,7 @@ class CamWindow(QWidget):
 
         # Buttons row
         helpbtn = QPushButton("Help?", self)
+        helpbtn.clicked.connect(self.openHelp)
         helpbtn.setStyleSheet("font-size: 25px;")
         closeBtn = QPushButton("Close", self)
         closeBtn.setStyleSheet("font-size: 25px;")
@@ -203,9 +208,9 @@ class CamWindow(QWidget):
         
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    # intro = IntroWindow()
+    intro = IntroWindow()
     # Debug
     # camwindow = CamWindow(10)
-    helpWindow = HelpWindow()
+    # helpWindow = HelpWindow()
     apply_stylesheet(app, theme='dark_teal.xml', extra={'density_scale': '5'})
     sys.exit(app.exec_())
