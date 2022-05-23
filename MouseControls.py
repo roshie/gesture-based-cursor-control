@@ -9,6 +9,26 @@ class MouseControls():
         self.drag = drag # values - 40 to 50
         self.scrollOffset = scrollOffset
         mixer.init()
+
+    def enterCharacter(self, char):
+        isCommand = lambda char: char == "Space" or char == "Enter" or char == "Backspace"
+        splChars = lambda char : char == "?" or char == "." or char == ";" or char == ","
+        Num = lambda char : ord(char) >= 48 and ord(char) <= 57
+        uppercase = lambda char: ord(char) >= 65 and ord(char) <= 90
+        commands = {
+            'Space': " ",
+            'Enter': 'enter',
+            'Backspace': 'backspace'
+        }
+        if isCommand(char):
+            pyag.press(commands[char])
+        elif splChars(char) or Num(char):
+            pyag.press(char)
+        elif uppercase(char):
+            # pyag.keyDown('shift')  # hold down the shift key
+            pyag.press(chr(ord(char)+32)) 
+            # pyag.keyUp('shift')
+        print(f"pressed {char}")
         
     def moveMouse(self, direction: str):
         if direction == 'right':

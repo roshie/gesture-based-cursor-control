@@ -5,6 +5,7 @@ from PyQt5.QtGui import QImage, QPixmap, QFont
 from VideoStreamThread import Thread
 from qt_material import apply_stylesheet
 from helpWindow import HelpWindow
+from KeyboardWindow import KeyboardWindow
 
 class IntroWindow(QWidget):
     def __init__(self):
@@ -222,9 +223,10 @@ class CamWindow(QWidget):
         
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    intro = IntroWindow()
+    # intro = IntroWindow()
     # Debug
     # camwindow = CamWindow(10)
     # helpWindow = HelpWindow()
+    keyboard = KeyboardWindow(40, 60)
     apply_stylesheet(app, theme='dark_teal.xml', extra={'density_scale': '5'})
     sys.exit(app.exec_())
