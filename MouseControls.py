@@ -11,23 +11,32 @@ class MouseControls():
         mixer.init()
 
     def enterCharacter(self, char):
-        isCommand = lambda char: char == "Space" or char == "Enter" or char == "Backspace"
+        print(f"Pressed Key: {char}")
+        commands = {
+            'Space': ' ',
+            'Enter': 'enter',
+            'Backspace': 'backspace',
+        }
+
+        if char in commands.keys():
+            if char == "Space":
+                pyag.hotkey('space')
+            else:
+                pyag.press(commands[char])
+            print(f"pressed {char}")
+            return
+
         splChars = lambda char : char == "?" or char == "." or char == ";" or char == ","
         Num = lambda char : ord(char) >= 48 and ord(char) <= 57
         uppercase = lambda char: ord(char) >= 65 and ord(char) <= 90
-        commands = {
-            'Space': " ",
-            'Enter': 'enter',
-            'Backspace': 'backspace'
-        }
-        if isCommand(char):
-            pyag.press(commands[char])
-        elif splChars(char) or Num(char):
+
+        if splChars(char) or Num(char):
             pyag.press(char)
         elif uppercase(char):
-            # pyag.keyDown('shift')  # hold down the shift key
             pyag.press(chr(ord(char)+32)) 
-            # pyag.keyUp('shift')
+        # Debug
+        else:
+            print(f"invalid input: {char}")
         print(f"pressed {char}")
         
     def moveMouse(self, direction: str):

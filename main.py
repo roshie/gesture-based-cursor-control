@@ -1,22 +1,26 @@
 import sys
 from PyQt5.QtWidgets import  QWidget, QLabel, QApplication, QDesktopWidget, QPushButton, QGridLayout, QSlider, QHBoxLayout, QVBoxLayout
+from PyQt5 import QtCore
 from PyQt5.QtCore import pyqtSlot, Qt, QRect
 from PyQt5.QtGui import QImage, QPixmap, QFont
 from VideoStreamThread import Thread
 from qt_material import apply_stylesheet
 from helpWindow import HelpWindow
 from KeyboardWindow import KeyboardWindow
+import pyautogui as pg
 
 class IntroWindow(QWidget):
+    
     def __init__(self):
         super().__init__()
         self.title = 'Mouse Control'
         self.left = 0
         self.top = 0
-        self.width = 800
-        self.height = 700
+        self.width = pg.size().width//4 + 150
+        self.height = pg.size().height//2
         self.cursorSensitivity = 10
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
+
         self.initUI()
 
     def initUI(self):
@@ -96,6 +100,8 @@ class CamWindow(QWidget):
         self.title = 'Mouse Control'
         self.left = 0
         self.top = 0
+        # self.width = pg.size().width//3
+        # self.height = pg.size().height//3
         self.width = 1500
         self.height = 700
         self.CursorSensitivity = CursorSensitivity
@@ -122,6 +128,13 @@ class CamWindow(QWidget):
         self.videoStreamThread.terminate()
         self.intro = IntroWindow()
         self.intro.show()
+
+    def openKeyboard(self):
+        print("Open Keyboard")
+        self.keyboard = KeyboardWindow(40, 60)
+        self.keyboard.show()
+        # self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowStaysOnTopHint)
+        self.keyboard.setWindowFlags(Qt.WindowStaysOnTopHint)
 
     def changInputMode(self, val):
         self.inputStatus.setText("OFF" if not val else "ON")
@@ -197,6 +210,7 @@ class CamWindow(QWidget):
 
         keyboardbtn = QPushButton("Show Keyboard", self)
         keyboardbtn.setStyleSheet("font-size: 25px;")
+        keyboardbtn.clicked.connect(self.openKeyboard)
         buttonsRow.addWidget(keyboardbtn)
 
         buttonsRow.addWidget(helpbtn)
@@ -223,10 +237,10 @@ class CamWindow(QWidget):
         
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    # intro = IntroWindow()
+    intro = IntroWindow()
     # Debug
     # camwindow = CamWindow(10)
     # helpWindow = HelpWindow()
-    keyboard = KeyboardWindow(40, 60)
+    # keyboard = KeyboardWindow(40, 60)
     apply_stylesheet(app, theme='dark_teal.xml', extra={'density_scale': '5'})
     sys.exit(app.exec_())

@@ -22,8 +22,8 @@ class KeyboardWindow(QWidget):
         self.top = 0
         self.width = 1000
         self.height = 500
-        self.mousecontrols = MouseControls(sensitivity, scroll)
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.mousecontrols = MouseControls(sensitivity, scroll)
         self.initUI()
 
     def initUI(self):
@@ -75,7 +75,8 @@ class KeyboardWindow(QWidget):
         btnPrd = KeyboardBtn(".", self)
         btnques= KeyboardBtn("?", self)
 
-        btnSpace = KeyboardBtn("Space", self)
+        # btnSpace = KeyboardBtn("Space", self)
+        rand = KeyboardBtn("Space", self)
         btnEnter = KeyboardBtn("Enter", self)
         btnBackSpace = KeyboardBtn("Backspace", self)
 
@@ -130,7 +131,7 @@ class KeyboardWindow(QWidget):
          # row 5
         grid.addWidget(btnBackSpace, 4, 0, 4, 2)
         grid.addWidget(btnEnter, 4, 2, 4, 3)
-        grid.addWidget(btnSpace, 4, 5, 4, 5)
+        grid.addWidget(rand, 4, 5, 4, 5)
 
         # self.setLayout(layout)
         self.setLayout(grid)
