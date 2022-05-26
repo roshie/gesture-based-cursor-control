@@ -3,7 +3,6 @@ import numpy as np
 import imutils
 import dlib
 import cv2
-from MouseControls import MouseControls
 from Notifier import Notifier
 
 # Model
@@ -41,9 +40,9 @@ unit_w = resolution_w / cam_w
 unit_h = resolution_h / cam_h
 
 class FacialMouse(Notifier):
-    """ @param sensitivity: int - Mouse sensitivity {0 - 15} """
+    """ @param sensitivity: int - Mouse controls instance """
 
-    def __init__(self, sensitivity=5):
+    def __init__(self, mouse_control):
         self._observers = []
 
         # Initialize counters
@@ -64,7 +63,7 @@ class FacialMouse(Notifier):
         self.predictor = dlib.shape_predictor(SHAPE_PREDICTOR)
 
         # Mouse Control object
-        self.mouse_control = MouseControls(35 + sensitivity, 60)
+        self.mouse_control = mouse_control
 
     def setEyebrowLiftCtr(self):
         self.updatePercentage(self.eyebrow_lift_ctr*10)

@@ -3,11 +3,13 @@ from PyQt5.QtWidgets import  QWidget, QLabel, QApplication, QDesktopWidget, QPus
 from PyQt5 import QtCore
 from PyQt5.QtCore import pyqtSlot, Qt, QRect
 from PyQt5.QtGui import QImage, QPixmap, QFont
+from GlobalVars import CAM_WINDOW_HEIGHT, CAM_WINDOW_WIDTH
+from MouseControls import MouseControls
 from VideoStreamThread import Thread
 from qt_material import apply_stylesheet
 from helpWindow import HelpWindow
 from KeyboardWindow import KeyboardWindow
-import pyautogui as pg
+# import pyautogui as pg
 
 class IntroWindow(QWidget):
     
@@ -16,8 +18,9 @@ class IntroWindow(QWidget):
         self.title = 'Mouse Control'
         self.left = 0
         self.top = 0
-        self.width = pg.size().width//4 + 150
-        self.height = pg.size().height//2
+        pg = QDesktopWidget().availableGeometry()
+        self.width = pg.width()//4 
+        self.height = pg.height() * CAM_WINDOW_HEIGHT
         self.cursorSensitivity = 10
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
 
@@ -100,11 +103,9 @@ class CamWindow(QWidget):
         self.title = 'Mouse Control'
         self.left = 0
         self.top = 0
-        # self.width = pg.size().width//3
-        # self.height = pg.size().height//3
-        self.width = 1500
-        self.height = 700
-        self.CursorSensitivity = CursorSensitivity
+        self.mouseControls = MouseControls(CursorSensitivity, 40)
+        self.width = self.mouseControls.screenWidth() * CAM_WINDOW_WIDTH
+        self.height = self.mouseControls.screenWidth() * CAM_WINDOW_HEIGHT
         self.inputMode = False
         self.scrollMode = False
         self.percentile = 0
@@ -119,6 +120,9 @@ class CamWindow(QWidget):
         y = 2 * ag.height() - sg.height() - widget.height()
         self.move(x, y)
 
+    def mousePressEvent(self, e):
+        print("mousePressEvent", e.globalPos())
+
     @pyqtSlot(QImage)
     def setImage(self, image):
         self.imageLabel.setPixmap(QPixmap.fromImage(image))
@@ -130,11 +134,8 @@ class CamWindow(QWidget):
         self.intro.show()
 
     def openKeyboard(self):
-        print("Open Keyboard")
-        self.keyboard = KeyboardWindow(40, 60)
+        self.keyboard = KeyboardWindow(self.mouseControls)
         self.keyboard.show()
-        # self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowStaysOnTopHint)
-        self.keyboard.setWindowFlags(Qt.WindowStaysOnTopHint)
 
     def changInputMode(self, val):
         self.inputStatus.setText("OFF" if not val else "ON")
@@ -159,8 +160,10 @@ class CamWindow(QWidget):
         self.resize(self.width, self.height)
         # create a label
         self.imageLabel = QLabel(self)
-        self.imageLabel.resize(800, 800)
-        self.videoStreamThread = Thread(self, self.CursorSensitivity)
+        self.imageLabel.resize(int(self.width-50), int(self.height-50))
+        self.videoStreamThread = Thread(self, self.mouseControls)
+        self.imageLabel.setText("Loading...")
+        self.imageLabel.setStyleSheet("font-size: 30px;")
         self.videoStreamThread.changePixmap.connect(self.setImage)
         self.videoStreamThread.attach(self)
         self.videoStreamThread.start()
@@ -201,15 +204,15 @@ class CamWindow(QWidget):
         # Buttons row
         helpbtn = QPushButton("Help?", self)
         helpbtn.clicked.connect(self.openHelp)
-        helpbtn.setStyleSheet("font-size: 25px;")
+        helpbtn.setStyleSheet("font-size: 25px; padding: 2;")
         closeBtn = QPushButton("Close", self)
-        closeBtn.setStyleSheet("font-size: 25px;")
+        closeBtn.setStyleSheet("font-size: 25px; padding: 2;")
         closeBtn.clicked.connect(self.onClose)
 
         buttonsRow = QHBoxLayout()
 
-        keyboardbtn = QPushButton("Show Keyboard", self)
-        keyboardbtn.setStyleSheet("font-size: 25px;")
+        keyboardbtn = QPushButton("Show\nKeyboard", self)
+        keyboardbtn.setStyleSheet("font-size: 25px; padding: 2;")
         keyboardbtn.clicked.connect(self.openKeyboard)
         buttonsRow.addWidget(keyboardbtn)
 

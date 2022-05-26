@@ -10,11 +10,11 @@ from Notifier import Notifier
 class Thread(QThread, Notifier):
     changePixmap = pyqtSignal(QImage)
     mouseSensitivity = 5
+    loading = True
 
-    def __init__(self, window, mouseSensitivity) -> None:
+    def __init__(self, window, mouseControls) -> None:
         super().__init__(window)
-        self.mouseSensitivity = mouseSensitivity
-
+        self.mouseControls = mouseControls
     def changInputMode(self, val):
         self.changeInputMode(val)
 
@@ -27,10 +27,11 @@ class Thread(QThread, Notifier):
     def run(self):
         self.cap = cv2.VideoCapture(0)
         
-        facial_mouse = FacialMouse(self.mouseSensitivity)
+        facial_mouse = FacialMouse(self.mouseControls)
         facial_mouse.attach(self)
         
         while True:
+            if self.loading: self.loading = False
             ret, frame = self.cap.read()
             frame = facial_mouse.setFrame(frame)
 

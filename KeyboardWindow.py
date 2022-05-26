@@ -1,7 +1,6 @@
 
 from PyQt5.QtCore import pyqtSlot, Qt, QRect
-from PyQt5.QtWidgets import  QWidget, QLabel, QApplication, QDesktopWidget, QPushButton, QGridLayout, QSlider, QHBoxLayout, QVBoxLayout
-from MouseControls import MouseControls
+from PyQt5.QtWidgets import  QWidget, QLabel, QApplication, QDesktopWidget, QPushButton, QGridLayout
 
 class KeyboardBtn(QPushButton):
     def __init__(self, char, window):
@@ -15,7 +14,7 @@ class KeyboardBtn(QPushButton):
         self.mc.enterCharacter(self.val)
 
 class KeyboardWindow(QWidget):
-    def __init__(self, sensitivity, scroll):
+    def __init__(self, mouseControls):
         super().__init__()
         self.title = 'Keyboard'
         self.left = 0
@@ -23,8 +22,11 @@ class KeyboardWindow(QWidget):
         self.width = 1000
         self.height = 500
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.mousecontrols = MouseControls(sensitivity, scroll)
+        self.mousecontrols = mouseControls
         self.initUI()
+
+    def mousePressEvent(self, e):
+        print("mousePressEvent", e.globalPos())
 
     def initUI(self):
         self.setWindowTitle(self.title)
