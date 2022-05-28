@@ -4,7 +4,7 @@ from PyQt5 import QtCore
 from PyQt5.QtCore import pyqtSlot, Qt, QRect
 from PyQt5.QtGui import QImage, QPixmap, QFont
 from GlobalVars import CAM_WINDOW_HEIGHT, CAM_WINDOW_WIDTH
-from CursorMethods import CursorMethods
+from CursorActions import CursorActions
 from VideoStreamThread import Thread
 from qt_material import apply_stylesheet
 from helpWindow import HelpWindow
@@ -103,7 +103,7 @@ class CamWindow(QWidget):
         self.title = 'Mouse Control'
         self.left = 0
         self.top = 0
-        self.mouseControls = CursorMethods(CursorSensitivity, 40)
+        self.mouseControls = CursorActions(CursorSensitivity, 40)
         self.width = self.mouseControls.screenWidth() * CAM_WINDOW_WIDTH
         self.height = self.mouseControls.screenWidth() * CAM_WINDOW_HEIGHT
         self.inputMode = False
