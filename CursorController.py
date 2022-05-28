@@ -39,7 +39,7 @@ cam_h = 720
 unit_w = resolution_w / cam_w
 unit_h = resolution_h / cam_h
 
-class FacialMouse(Notifier):
+class CursorController(Notifier):
     """ @param sensitivity: int - Mouse controls instance """
 
     def __init__(self, mouse_control):
