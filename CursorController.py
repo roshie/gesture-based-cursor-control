@@ -13,7 +13,7 @@ SHORT_BLINK_FRAMES = 2
 LONG_BLINK_FRAMES = 5
 EYEBROW_LIFT_FRAMES = 3
 LONG_EYEBROW_LIFT_FRAMES = 10
-EYEBROW_THRESH = 0.4
+EYEBROW_THRESH = 0.45
 EYE_AR_LIFT_THRESH = 0.3
 EYE_AR_THRESH = 0.16
 
@@ -24,6 +24,7 @@ RED_COLOR = (0, 0, 255)
 GREEN_COLOR = (0, 255, 0)
 BLUE_COLOR = (255, 0, 0)
 BLACK_COLOR = (0, 0, 0)
+TEAL_COLOR = (0, 220, 220)
 
 # Grab the landmark indexes
 (lStart, lEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
@@ -177,7 +178,7 @@ class CursorController(Notifier):
 
             # Draw box around nose
             cv2.rectangle(frame, (x - w, y - h), (x + w, y + h), RED_COLOR, 4)
-            cv2.line(frame, self.anchor_point, nose_point, YELLOW_COLOR, 3)
+            cv2.line(frame, self.anchor_point, nose_point, RED_COLOR, 3)
 
             _direction = self.direction(nose_point, self.anchor_point, w, h)
             # _Debug_
@@ -224,16 +225,16 @@ class CursorController(Notifier):
         rightBrowHull = cv2.convexHull(coordinates[3])
         leftEyeHull = cv2.convexHull(coordinates[0])
         rightEyeHull = cv2.convexHull(coordinates[1])
-        cv2.drawContours(frame, [leftBrowHull], -1, YELLOW_COLOR, 4)
-        cv2.drawContours(frame, [rightBrowHull], -1, YELLOW_COLOR, 4)
-        cv2.drawContours(frame, [leftEyeHull], -1, YELLOW_COLOR, 4)
-        cv2.drawContours(frame, [rightEyeHull], -1, YELLOW_COLOR, 4)
+        cv2.drawContours(frame, [leftBrowHull], -1, YELLOW_COLOR, 1)
+        cv2.drawContours(frame, [rightBrowHull], -1, YELLOW_COLOR, 1)
+        cv2.drawContours(frame, [leftEyeHull], -1, YELLOW_COLOR, 1)
+        cv2.drawContours(frame, [rightEyeHull], -1, YELLOW_COLOR, 1)
 
-        for (x, y) in np.concatenate((coordinates[2], coordinates[3], coordinates[0], coordinates[1]), axis=0):
-            cv2.circle(frame, (x, y), 2, GREEN_COLOR, -1)
+        # for (x, y) in np.concatenate((coordinates[2], coordinates[3], coordinates[0], coordinates[1]), axis=0):
+            # cv2.circle(frame, (x, y), 2, GREEN_COLOR, -1)
 
-        nose_point = (coordinates[4][3, 0], coordinates[4][3, 1])
-        cv2.circle(frame, nose_point, 5, RED_COLOR, -1)
+        # nose_point = (coordinates[4][3, 0], coordinates[4][3, 1])
+        # cv2.circle(frame, nose_point, 5, RED_COLOR, -1)
 
 
     # Returns EAR given eye landmarks
