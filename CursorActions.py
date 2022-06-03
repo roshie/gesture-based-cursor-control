@@ -7,7 +7,7 @@ from GlobalVars import CAM_WINDOW_HEIGHT, CAM_WINDOW_WIDTH
 # Import Click sound
 clickSound = 'sounds/MouseClick.mp3'
 
-class MouseControls():
+class CursorActions():
     """
     @params 
     drag: Cursor Sensitivity {0 - 15} ;

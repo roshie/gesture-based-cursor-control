@@ -4,7 +4,7 @@ import pyautogui as pyag
 from PyQt5.QtWidgets import  QWidget, QLabel, QApplication
 from PyQt5.QtCore import QThread, Qt, pyqtSignal, pyqtSlot
 from PyQt5.QtGui import QImage, QPixmap
-from FacialMouse import FacialMouse
+from CursorController import CursorController
 from Notifier import Notifier
 
 class Thread(QThread, Notifier):
@@ -27,7 +27,7 @@ class Thread(QThread, Notifier):
     def run(self):
         self.cap = cv2.VideoCapture(0)
         
-        facial_mouse = FacialMouse(self.mouseControls)
+        facial_mouse = CursorController(self.mouseControls)
         facial_mouse.attach(self)
         
         while True:
