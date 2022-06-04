@@ -6,7 +6,7 @@ import cv2
 from Notifier import Notifier
 
 # Model
-SHAPE_PREDICTOR = "shape_predictor_68_face_landmarks.dat"
+SHAPE_PREDICTOR = "model/landmark_predictor.dat"
 
 # Threshold values and Frames
 SHORT_BLINK_FRAMES = 2
@@ -26,12 +26,21 @@ BLUE_COLOR = (255, 0, 0)
 BLACK_COLOR = (0, 0, 0)
 TEAL_COLOR = (0, 220, 220)
 
-# Grab the landmark indexes
-(lStart, lEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
-(lbStart, lbEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eyebrow"]
-(rStart, rEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
-(rbStart, rbEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eyebrow"]
-(nStart, nEnd) = face_utils.FACIAL_LANDMARKS_IDXS["nose"]
+# Grab the landmark indexes (default)
+# (lStart, lEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
+print(face_utils.FACIAL_LANDMARKS_IDXS["jaw"])
+# (lbStart, lbEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eyebrow"]
+# (rStart, rEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
+# (rbStart, rbEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eyebrow"]
+# (nStart, nEnd) = face_utils.FACIAL_LANDMARKS_IDXS["nose"]
+
+# Grab the landmark indexes (custom model indexes)
+lbStart, lbEnd = 0, 5
+rbStart, rbEnd = 5, 10
+nStart, nEnd = 10, 19
+lStart, lEnd = 19, 25
+rStart, rEnd = 25, 31
+
 
 resolution_w = 1366
 resolution_h = 768
@@ -109,6 +118,7 @@ class CursorController(Notifier):
         ear = (leftEAR + rightEAR) / 2.0
 
         nose_point = (nose[3, 0], nose[3, 1])
+        print(nose_point)
 
         # Mark the Landmarks
         self.mark_landmarks(coordinates, frame)
@@ -225,13 +235,13 @@ class CursorController(Notifier):
         rightBrowHull = cv2.convexHull(coordinates[3])
         leftEyeHull = cv2.convexHull(coordinates[0])
         rightEyeHull = cv2.convexHull(coordinates[1])
-        cv2.drawContours(frame, [leftBrowHull], -1, YELLOW_COLOR, 1)
-        cv2.drawContours(frame, [rightBrowHull], -1, YELLOW_COLOR, 1)
-        cv2.drawContours(frame, [leftEyeHull], -1, YELLOW_COLOR, 1)
-        cv2.drawContours(frame, [rightEyeHull], -1, YELLOW_COLOR, 1)
+        cv2.drawContours(frame, [leftBrowHull], -1, YELLOW_COLOR, 4)
+        cv2.drawContours(frame, [rightBrowHull], -1, YELLOW_COLOR, 4)
+        cv2.drawContours(frame, [leftEyeHull], -1, YELLOW_COLOR, 4)
+        cv2.drawContours(frame, [rightEyeHull], -1, YELLOW_COLOR, 4)
 
         # for (x, y) in np.concatenate((coordinates[2], coordinates[3], coordinates[0], coordinates[1]), axis=0):
-            # cv2.circle(frame, (x, y), 2, GREEN_COLOR, -1)
+        #     cv2.circle(frame, (x, y), 2, GREEN_COLOR, -1)
 
         # nose_point = (coordinates[4][3, 0], coordinates[4][3, 1])
         # cv2.circle(frame, nose_point, 5, RED_COLOR, -1)
