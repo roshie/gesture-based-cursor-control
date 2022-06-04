@@ -5,7 +5,6 @@ from PyQt5.QtGui import QImage, QPixmap, QFont
 from VideoStreamThread import Thread
 from qt_material import apply_stylesheet
 
-
 class HelpWindow(QWidget):
     def __init__(self, fontSize):
         super().__init__()
@@ -13,11 +12,15 @@ class HelpWindow(QWidget):
         self.title = 'Help'
         self.left = 0
         self.top = 0
-        self.width = 800
-        self.height = 500
-        self.cursorSensitivity = 10
+        pg = QDesktopWidget().availableGeometry()
+        self.width = pg.width()//4
+        self.height = pg.height()//4
+        
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.initUI()
+
+    def getFontSize(self, scale) -> str:
+        return "font-size: {}px;".format(int(self.fontSize*scale))
 
     def initUI(self):
         self.setWindowTitle(self.title)
@@ -30,7 +33,7 @@ class HelpWindow(QWidget):
         Lift your eyebrows for 3 seconds
         """)
         self.label1.setAlignment(Qt.AlignCenter)
-        self.label1.setStyleSheet("font-size: 30px;")
+        self.label1.setStyleSheet(self.getFontSize(1.2))
 
         self.label2 = QLabel(self)
         self.label2.setText("""
@@ -38,23 +41,23 @@ class HelpWindow(QWidget):
         Lift your eyebrows for 1 second
         """)
         self.label2.setAlignment(Qt.AlignCenter)
-        self.label2.setStyleSheet("font-size: 30px;")
+        self.label2.setStyleSheet(self.getFontSize(1.2))
 
         self.label3 = QLabel(self)
         self.label3.setText("Left click: Do a quick medium paced blink")
         self.label3.setAlignment(Qt.AlignCenter)
-        self.label3.setStyleSheet("font-size: 30px;")
+        self.label3.setStyleSheet(self.getFontSize(1.2))
 
         self.label4 = QLabel(self)
         self.label4.setText("Right click: Do a long blink")
         self.label4.setAlignment(Qt.AlignCenter)
-        self.label4.setStyleSheet(" font-size: 30px;")
+        self.label4.setStyleSheet(self.getFontSize(1.2))
         
 
         self.button = QPushButton("Close", self)
         # self.button.resize(50,50)
         self.button.clicked.connect(self.on_close_clicked)
-        self.button.setStyleSheet("font-size: 25px;")
+        self.button.setStyleSheet(self.getFontSize(1.2))
 
         # rowLayout = QVBoxLayout
         # Add widgets to the layout
@@ -76,9 +79,6 @@ class HelpWindow(QWidget):
 
         self.location_on_the_screen()
         self.show()
-
-    def setCursorSensitivity(self, value):
-        self.cursorSensitivity = value
 
     def on_close_clicked(self):
         
