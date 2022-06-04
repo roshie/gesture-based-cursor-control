@@ -14,7 +14,7 @@ class CursorActions():
     scrollOffset: Scroll value {Default: 40}
     """
     def __init__(self, drag, scrollOffset):
-        self.drag = 35 + drag # values - 0 to 10
+        self.drag = 15 + drag # values - 0 to 10
         self.scrollOffset = scrollOffset
         mixer.init()
         self.clickQueue = []

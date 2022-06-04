@@ -6,7 +6,7 @@ class KeyboardBtn(QPushButton):
     def __init__(self, char, window):
         super().__init__(char, window) 
         self.mc = window.mousecontrols
-        self.setStyleSheet("font-size: 30px; padding: 10px;")
+        self.setStyleSheet(f"font-size: {int(window.fontSize*1.5)}px; padding-left: 5px; padding-right: 5px; padding-top: 1px; padding-bottom: 1px;")
         self.val = char
         self.clicked.connect(self.keyPressed)
 
@@ -14,13 +14,15 @@ class KeyboardBtn(QPushButton):
         self.mc.enterCharacter(self.val)
 
 class KeyboardWindow(QWidget):
-    def __init__(self, mouseControls):
+    def __init__(self, mouseControls, fontSize):
         super().__init__()
+        self.fontSize = fontSize
         self.title = 'Keyboard'
         self.left = 0
         self.top = 0
-        self.width = 1000
-        self.height = 500
+        pg = QDesktopWidget().availableGeometry()
+        self.width = pg.width()//3
+        self.height = pg.height()//4
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.mousecontrols = mouseControls
         self.initUI()

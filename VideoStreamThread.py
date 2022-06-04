@@ -14,6 +14,7 @@ class Thread(QThread, Notifier):
 
     def __init__(self, window, mouseControls) -> None:
         super().__init__(window)
+        self.window = window
         self.mouseControls = mouseControls
     def changInputMode(self, val):
         self.changeInputMode(val)
@@ -40,7 +41,7 @@ class Thread(QThread, Notifier):
                 h, w, ch = rgbImage.shape
                 bytesPerLine = ch * w
                 convertToQtFormat = QImage(rgbImage.data, w, h, bytesPerLine, QImage.Format_RGB888)
-                p = convertToQtFormat.scaled(750, 750, Qt.KeepAspectRatio)
+                p = convertToQtFormat.scaled(self.window.width//2, self.window.height, Qt.KeepAspectRatio)
                 self.changePixmap.emit(p)
                 
     def __del__(self):

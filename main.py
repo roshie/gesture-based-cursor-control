@@ -3,13 +3,16 @@ from PyQt5.QtWidgets import  QWidget, QLabel, QApplication, QDesktopWidget, QPus
 from PyQt5 import QtCore
 from PyQt5.QtCore import pyqtSlot, Qt, QRect
 from PyQt5.QtGui import QImage, QPixmap, QFont
-from GlobalVars import CAM_WINDOW_HEIGHT, CAM_WINDOW_WIDTH
+from GlobalVars import CAM_WINDOW_HEIGHT, CAM_WINDOW_WIDTH, SYS_FONT_SIZE
 from CursorActions import CursorActions
 from VideoStreamThread import Thread
 from qt_material import apply_stylesheet
 from helpWindow import HelpWindow
 from KeyboardWindow import KeyboardWindow
 # import pyautogui as pg
+
+FONT_SIZE = "font-size: {}px; "
+FONT_BOLD = "font-weight: bold; "
 
 class IntroWindow(QWidget):
     
@@ -20,9 +23,10 @@ class IntroWindow(QWidget):
         self.top = 0
         pg = QDesktopWidget().availableGeometry()
         self.width = pg.width()//4 
-        self.height = pg.height() * CAM_WINDOW_HEIGHT
+        self.height = pg.height()//3
         self.cursorSensitivity = 10
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.fontSize = int(pg.height()*SYS_FONT_SIZE)
 
         self.initUI()
 
@@ -34,17 +38,17 @@ class IntroWindow(QWidget):
         self.label1 = QLabel(self)
         self.label1.setText("Facial-Gesture based mouse")
         self.label1.setAlignment(Qt.AlignCenter)
-        self.label1.setStyleSheet("font-weight: bold; font-size: 40px;")
+        self.label1.setStyleSheet(FONT_BOLD + FONT_SIZE.format(self.fontSize*2))
 
         self.label2 = QLabel(self)
         self.label2.setText("Set Cursor Sensitivity")
         self.label2.setAlignment(Qt.AlignCenter)
-        self.label2.setStyleSheet("font-size: 30px;")
+        self.label2.setStyleSheet(FONT_SIZE.format(self.fontSize*1.5))
 
         minLabel = QLabel(self)
         minLabel.setText("1")
         minLabel.setAlignment(Qt.AlignCenter)
-        minLabel.setStyleSheet("font-size: 25px;")
+        minLabel.setStyleSheet(FONT_SIZE.format(self.fontSize))
 
         slider = QSlider(Qt.Horizontal)
         slider.valueChanged.connect(self.setCursorSensitivity)
@@ -55,16 +59,16 @@ class IntroWindow(QWidget):
         maxLabel = QLabel(self)
         maxLabel.setText("10")
         maxLabel.setAlignment(Qt.AlignCenter)
-        maxLabel.setStyleSheet("font-size: 25px;")
+        maxLabel.setStyleSheet(FONT_SIZE.format(self.fontSize))
 
         self.button = QPushButton("Start Camera", self)
         self.button.clicked.connect(self.on_pushButton_clicked)
-        self.button.setStyleSheet("font-size: 25px;")
+        self.button.setStyleSheet(FONT_SIZE.format(self.fontSize) + " padding-top: 2; padding-bottom: 2;")
 
         rowLayout = QHBoxLayout()
         # Add widgets to the layout
         rowLayout.addWidget(minLabel)
-        rowLayout.addWidget(slider, 5)
+        rowLayout.addWidget(slider,5)
         rowLayout.addWidget(maxLabel)
 
         rowLayoutWrapper = QLabel()
@@ -105,11 +109,13 @@ class CamWindow(QWidget):
         self.top = 0
         self.mouseControls = CursorActions(CursorSensitivity, 40)
         self.width = self.mouseControls.screenWidth() * CAM_WINDOW_WIDTH
-        self.height = self.mouseControls.screenWidth() * CAM_WINDOW_HEIGHT
+        self.height = self.mouseControls.screenHeight() * CAM_WINDOW_HEIGHT
         self.inputMode = False
         self.scrollMode = False
         self.percentile = 0
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
+        pg = QDesktopWidget().availableGeometry()
+        self.fontSize = int(pg.height()*SYS_FONT_SIZE)
         self.initUI()
     def location_on_the_screen(self):
         ag = QDesktopWidget().availableGeometry()
@@ -134,16 +140,16 @@ class CamWindow(QWidget):
         self.intro.show()
 
     def openKeyboard(self):
-        self.keyboard = KeyboardWindow(self.mouseControls)
+        self.keyboard = KeyboardWindow(self.mouseControls, self.fontSize)
         self.keyboard.show()
 
     def changInputMode(self, val):
         self.inputStatus.setText("OFF" if not val else "ON")
-        self.inputStatus.setStyleSheet(f"color: {'red' if not val else 'green'}; font-size: 40px;")
+        self.inputStatus.setStyleSheet(f"color: {'red' if not val else 'green'}; {FONT_SIZE.format(self.fontSize*2)}")
 
     def changScrollMode(self, val):
         self.scrollStatus.setText("OFF" if not val else "ON")
-        self.scrollStatus.setStyleSheet(f"color: {'red' if not val else 'green'}; font-size: 40px;")
+        self.scrollStatus.setStyleSheet(f"color: {'red' if not val else 'green'}; {FONT_SIZE.format(self.fontSize*2)}")
 
     def updatPercentage(self, val):
         if val == 0:
@@ -151,7 +157,7 @@ class CamWindow(QWidget):
         else:
             self.eyebrowLiftPercent.setText(str(val) + '%')
     def openHelp(self):
-        self.helpWindow = HelpWindow()
+        self.helpWindow = HelpWindow(self.fontSize)
         self.helpWindow.show()     
 
     def initUI(self):
@@ -160,23 +166,22 @@ class CamWindow(QWidget):
         self.resize(self.width, self.height)
         # create a label
         self.imageLabel = QLabel(self)
-        self.imageLabel.resize(int(self.width-50), int(self.height-50))
         self.videoStreamThread = Thread(self, self.mouseControls)
         self.imageLabel.setText("Loading...")
-        self.imageLabel.setStyleSheet("font-size: 30px;")
+        self.imageLabel.setStyleSheet(FONT_SIZE.format(self.fontSize*2))
         self.videoStreamThread.changePixmap.connect(self.setImage)
         self.videoStreamThread.attach(self)
         self.videoStreamThread.start()
 
         self.eyebrowLiftPercent = QLabel("")
-        self.eyebrowLiftPercent.setStyleSheet("font-size: 30px;")
+        self.eyebrowLiftPercent.setStyleSheet(FONT_SIZE.format(self.fontSize*2))
 
         # input mode
         inputModeLabel = QLabel("INPUT MODE: ")
-        inputModeLabel.setStyleSheet("font-size: 30px;")
+        inputModeLabel.setStyleSheet(FONT_SIZE.format(self.fontSize*2))
 
         self.inputStatus = QLabel("OFF")
-        self.inputStatus.setStyleSheet(f"color: red; font-size: 40px;")
+        self.inputStatus.setStyleSheet(f"color: red; {FONT_SIZE.format(self.fontSize*2)}")
 
         inputModeRow = QHBoxLayout()
         inputModeRow.addWidget(inputModeLabel)
@@ -184,16 +189,16 @@ class CamWindow(QWidget):
         inputModeRowWrapper = QLabel()
         inputModeRowWrapper.setLayout(inputModeRow)
 
-        inputModeHelperText = QLabel(" (Lift your eyebrows for 3 seconds to turn on)")
+        inputModeHelperText = QLabel("(Look at the camera and\nLift your eyebrows for \n3 seconds to turn on)")
         inputModeHelperText.setAlignment(Qt.AlignTop)
-        inputModeHelperText.setStyleSheet("font-size: 25px;")
+        inputModeHelperText.setStyleSheet(FONT_SIZE.format(int(self.fontSize)) + " padding-left: 5px;")
 
         # Scroll Mode
         scrollModeLabel = QLabel("SCROLL MODE: ")
-        scrollModeLabel.setStyleSheet("font-size: 30px;")
+        scrollModeLabel.setStyleSheet(FONT_SIZE.format(self.fontSize*2))
 
         self.scrollStatus = QLabel('OFF')
-        self.scrollStatus.setStyleSheet("color: red; font-size: 40px;")
+        self.scrollStatus.setStyleSheet(f"color: red; {FONT_SIZE.format(self.fontSize*2)}")
 
         scrollModeRow = QHBoxLayout()
         scrollModeRow.addWidget(scrollModeLabel)
@@ -204,15 +209,15 @@ class CamWindow(QWidget):
         # Buttons row
         helpbtn = QPushButton("Help?", self)
         helpbtn.clicked.connect(self.openHelp)
-        helpbtn.setStyleSheet("font-size: 25px; padding: 2;")
+        helpbtn.setStyleSheet(f"{FONT_SIZE.format(int(self.fontSize*1.5))} padding: 2;")
         closeBtn = QPushButton("Close", self)
-        closeBtn.setStyleSheet("font-size: 25px; padding: 2;")
+        closeBtn.setStyleSheet(f"{FONT_SIZE.format(int(self.fontSize*1.5))} padding: 2;")
         closeBtn.clicked.connect(self.onClose)
 
         buttonsRow = QHBoxLayout()
 
-        keyboardbtn = QPushButton("Show\nKeyboard", self)
-        keyboardbtn.setStyleSheet("font-size: 25px; padding: 2;")
+        keyboardbtn = QPushButton("Keyboard", self)
+        keyboardbtn.setStyleSheet(f"{FONT_SIZE.format(int(self.fontSize*1.5))} padding: 2;")
         keyboardbtn.clicked.connect(self.openKeyboard)
         buttonsRow.addWidget(keyboardbtn)
 

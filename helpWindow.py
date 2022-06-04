@@ -7,8 +7,9 @@ from qt_material import apply_stylesheet
 
 
 class HelpWindow(QWidget):
-    def __init__(self):
+    def __init__(self, fontSize):
         super().__init__()
+        self.fontSize = fontSize
         self.title = 'Help'
         self.left = 0
         self.top = 0

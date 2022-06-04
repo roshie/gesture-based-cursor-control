@@ -9,13 +9,13 @@ from Notifier import Notifier
 SHAPE_PREDICTOR = "model/landmark_predictor.dat"
 
 # Threshold values and Frames
-SHORT_BLINK_FRAMES = 2
-LONG_BLINK_FRAMES = 5
-EYEBROW_LIFT_FRAMES = 3
+SHORT_BLINK_FRAMES = 5
+LONG_BLINK_FRAMES = 10
+EYEBROW_LIFT_FRAMES = 5
 LONG_EYEBROW_LIFT_FRAMES = 10
 EYEBROW_THRESH = 0.45
-EYE_AR_LIFT_THRESH = 0.3
-EYE_AR_THRESH = 0.16
+EYE_AR_LIFT_THRESH = 0.32
+EYE_AR_THRESH = 0.19
 
 # And some Constants
 WHITE_COLOR = (255, 255, 255)
@@ -28,7 +28,6 @@ TEAL_COLOR = (0, 220, 220)
 
 # Grab the landmark indexes (default)
 # (lStart, lEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
-print(face_utils.FACIAL_LANDMARKS_IDXS["jaw"])
 # (lbStart, lbEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eyebrow"]
 # (rStart, rEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
 # (rbStart, rbEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eyebrow"]
@@ -37,9 +36,9 @@ print(face_utils.FACIAL_LANDMARKS_IDXS["jaw"])
 # Grab the landmark indexes (custom model indexes)
 lbStart, lbEnd = 0, 5
 rbStart, rbEnd = 5, 10
-nStart, nEnd = 10, 19
-lStart, lEnd = 19, 25
-rStart, rEnd = 25, 31
+nIndex = 10
+lStart, lEnd = 11, 17
+rStart, rEnd = 17, 23
 
 
 resolution_w = 1366
@@ -111,14 +110,13 @@ class CursorController(Notifier):
         # Extract the left and right eye coordinates
         coordinates = self.extract_coordinates(shape)
         leftEye, rightEye, leftBrow, rightBrow, nose = coordinates
-
+        
         # use the coordinates to compute the eye aspect ratio for both eyes
         leftEAR = self.eye_aspect_ratio(leftEye)
         rightEAR = self.eye_aspect_ratio(rightEye)
         ear = (leftEAR + rightEAR) / 2.0
 
-        nose_point = (nose[3, 0], nose[3, 1])
-        print(nose_point)
+        nose_point = nose
 
         # Mark the Landmarks
         self.mark_landmarks(coordinates, frame)
@@ -187,8 +185,8 @@ class CursorController(Notifier):
             w, h = 40, 25
 
             # Draw box around nose
-            cv2.rectangle(frame, (x - w, y - h), (x + w, y + h), RED_COLOR, 4)
-            cv2.line(frame, self.anchor_point, nose_point, RED_COLOR, 3)
+            cv2.rectangle(frame, (x - w, y - h), (x + w, y + h), RED_COLOR, 5)
+            cv2.line(frame, self.anchor_point, nose_point, RED_COLOR, 5)
 
             _direction = self.direction(nose_point, self.anchor_point, w, h)
             # _Debug_
@@ -220,7 +218,7 @@ class CursorController(Notifier):
         rightEye = shape[rStart:rEnd]
         leftBrow = shape[lbStart:lbEnd]
         rightBrow = shape[rbStart:rbEnd]
-        nose = shape[nStart:nEnd]
+        nose = shape[nIndex]
 
         # Because I flipped the frame, left is right, right is left.
         leftEye, rightEye = rightEye, leftEye
@@ -235,10 +233,10 @@ class CursorController(Notifier):
         rightBrowHull = cv2.convexHull(coordinates[3])
         leftEyeHull = cv2.convexHull(coordinates[0])
         rightEyeHull = cv2.convexHull(coordinates[1])
-        cv2.drawContours(frame, [leftBrowHull], -1, YELLOW_COLOR, 4)
-        cv2.drawContours(frame, [rightBrowHull], -1, YELLOW_COLOR, 4)
-        cv2.drawContours(frame, [leftEyeHull], -1, YELLOW_COLOR, 4)
-        cv2.drawContours(frame, [rightEyeHull], -1, YELLOW_COLOR, 4)
+        # cv2.drawContours(frame, [leftBrowHull], -1, YELLOW_COLOR, 4)
+        # cv2.drawContours(frame, [rightBrowHull], -1, YELLOW_COLOR, 4)
+        # cv2.drawContours(frame, [leftEyeHull], -1, YELLOW_COLOR, 4)
+        # cv2.drawContours(frame, [rightEyeHull], -1, YELLOW_COLOR, 4)
 
         # for (x, y) in np.concatenate((coordinates[2], coordinates[3], coordinates[0], coordinates[1]), axis=0):
         #     cv2.circle(frame, (x, y), 2, GREEN_COLOR, -1)
