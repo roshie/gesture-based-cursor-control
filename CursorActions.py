@@ -1,6 +1,10 @@
 from turtle import pos
 import pyautogui as pyag
+import os
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 from pygame import mixer
+import logging as log
+log.basicConfig(format='[%(levelname)s] %(message)s', level=log.DEBUG)
 
 from GlobalVars import CAM_WINDOW_HEIGHT, CAM_WINDOW_WIDTH
 
@@ -20,21 +24,24 @@ class CursorActions():
         self.clickQueue = []
 
     def enterCharacter(self, char):
-        x, y = 0, 0 if not len(self.clickQueue) else self.clickQueue[-1][-1]
-        print(x,y)
+        if not len(self.clickQueue):
+            log.debug("No Textfield is focussed")
+            return
+
+        x,y = self.clickQueue[-1]
         
         commands = {
             'Space': ' ',
             'Enter': 'enter',
             'Backspace': 'backspace',
         }
+        currentMousePosX, currentMousePosY = pyag.position()
         pyag.click(x=x, y=y)
         if char in commands.keys():
             if char == "Space":
                 pyag.hotkey('space')
             else:
                 pyag.press(commands[char])
-            print(f"Pressed Key: {char} - at coords x:{x} and y: {y}")
             return
 
         splChars = lambda char : char == "?" or char == "." or char == ";" or char == ","
@@ -47,10 +54,12 @@ class CursorActions():
             pyag.press(chr(ord(char)+32)) 
         # Debug
         else:
-            print(f"invalid input: {char}")
+            log.debug(f"invalid input: {char}")
+            pyag.moveTo(currentMousePosX, currentMousePosY)
             return
         self.playSound()
-        print(f"Pressed Key: {char} - at coords x:{x} and y: {y}")
+        log.debug("Character %s entered at Position %s, %s", char, x, y)
+        pyag.moveTo(currentMousePosX, currentMousePosY)
         
     def moveMouse(self, direction: str):
         if direction == 'right':
@@ -73,18 +82,25 @@ class CursorActions():
             pyag.scroll(-self.scrollOffset)
 
     def click(self, button: str):
-        self.recordClick(pyag.position())
         pyag.click(button=button)
+        self.recordClick(pyag.position())
         self.playSound()
 
-    def recordClick(self, position):
+    def recordClick(self, position, dimension=None):
         x, y = position
-        print(f"position {x} {y} - window width {self.screenWidth()- self.screenWidth() * CAM_WINDOW_WIDTH} Height {self.screenWidth()- self.screenHeight() * CAM_WINDOW_HEIGHT}")
-        if (x < self.screenWidth()-self.screenWidth() * CAM_WINDOW_WIDTH and y < self.screenWidth() - self.screenHeight() * CAM_WINDOW_HEIGHT):
-            self.clickQueue.append((x,y))
-            if len(self.clickQueue) > 5:
-                self.clickQueue.pop(0)
-        print(self.clickQueue)
+
+        if not dimension: 
+            dimension = self.screenWidth()-(self.screenWidth() * CAM_WINDOW_WIDTH), self.screenWidth() - (self.screenHeight() * CAM_WINDOW_HEIGHT)
+
+            log.debug("Window Dimension (%s, %s)", dimension[0], dimension[1])
+            
+            if x < dimension[0] and y < dimension[1]:
+
+                self.clickQueue.append((x,y))
+                if len(self.clickQueue) > 5:
+                    self.clickQueue.pop(0)
+        
+            log.debug("Front element in Click queue is (%s, %s)", self.clickQueue[-1][0], self.clickQueue[-1][1])
     
     def playSound(self):
         mixer.music.load(clickSound)

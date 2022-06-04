@@ -9,7 +9,8 @@ from VideoStreamThread import Thread
 from qt_material import apply_stylesheet
 from helpWindow import HelpWindow
 from KeyboardWindow import KeyboardWindow
-# import pyautogui as pg
+import logging as log
+log.basicConfig(format='[%(levelname)s] %(message)s', level=log.DEBUG)
 
 FONT_BOLD = "font-weight: bold; "
 
@@ -26,9 +27,9 @@ class IntroWindow(QWidget):
         self.cursorSensitivity = 10
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.fontSize = pg.height()*SYS_FONT_SIZE
-        print("Font Size", self.fontSize)
 
         self.initUI()
+        log.info("Application Started")
 
     def getFontSize(self, scale) -> str:
         return "font-size: {}px; ".format(int(self.fontSize*scale))
@@ -37,6 +38,10 @@ class IntroWindow(QWidget):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
         self.resize(self.width, self.height)
+        qtRectangle = self.frameGeometry()
+        centerPoint = QDesktopWidget().availableGeometry().center()
+        qtRectangle.moveCenter(centerPoint)
+        self.move(qtRectangle.topLeft())
         # create a label
         self.label1 = QLabel(self)
         self.label1.setText("Facial-Gesture based mouse")
@@ -85,7 +90,7 @@ class IntroWindow(QWidget):
 
         self.setLayout(self.layout)
 
-        self.location_on_the_screen()
+        # self.location_on_the_screen()
         self.show()
  
     def on_pushButton_clicked(self):
@@ -107,12 +112,13 @@ class IntroWindow(QWidget):
 class CamWindow(QWidget):
     def __init__(self, CursorSensitivity):
         super().__init__()
+
         self.title = 'Mouse Control'
         self.left = 0
         self.top = 0
         self.mouseControls = CursorActions(CursorSensitivity, 40)
-        self.width = self.mouseControls.screenWidth() * CAM_WINDOW_WIDTH
-        self.height = self.mouseControls.screenHeight() * CAM_WINDOW_HEIGHT
+        self.width = int(self.mouseControls.screenWidth() * CAM_WINDOW_WIDTH)
+        self.height = int(self.mouseControls.screenHeight() * CAM_WINDOW_HEIGHT)
         self.inputMode = False
         self.scrollMode = False
         self.percentile = 0
@@ -134,7 +140,7 @@ class CamWindow(QWidget):
         self.move(x, y)
 
     def mousePressEvent(self, e):
-        print("mousePressEvent", e.globalPos())
+        log.debug("Mouse pressed on Window")
 
     @pyqtSlot(QImage)
     def setImage(self, image):
@@ -251,6 +257,7 @@ class CamWindow(QWidget):
         self.show()
         
 if __name__ == '__main__':
+    log.info("Initializing application...")
     app = QApplication(sys.argv)
     intro = IntroWindow()
     # Debug

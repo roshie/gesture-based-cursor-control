@@ -5,13 +5,14 @@ from PyQt5.QtWidgets import  QWidget, QLabel, QApplication, QDesktopWidget, QPus
 class KeyboardBtn(QPushButton):
     def __init__(self, char, window):
         super().__init__(char, window) 
-        self.mc = window.mousecontrols
-        self.setStyleSheet(f"font-size: {int(window.fontSize*1.5)}px; padding-left: 5px; padding-right: 5px; padding-top: 1px; padding-bottom: 1px;")
-        self.val = char
-        self.clicked.connect(self.keyPressed)
-
-    def keyPressed(self):
-        self.mc.enterCharacter(self.val)
+        self.keyboardWindow = window
+        # windowDimension = (self.keyboardWindow.width, self.keyboardWindow.height)
+        self.setStyleSheet(f"font-size: {int(self.keyboardWindow.fontSize*1.5)}px; padding-left: 5px; padding-right: 5px; padding-top: 1px; padding-bottom: 1px;")
+        
+        try: 
+            self.clicked.connect(self.keyboardWindow.mousecontrols.enterCharacter(char))  
+        except TypeError as e:
+            print("line 15: ", e)
 
 class KeyboardWindow(QWidget):
     def __init__(self, mouseControls, fontSize):
@@ -28,7 +29,8 @@ class KeyboardWindow(QWidget):
         self.initUI()
 
     def mousePressEvent(self, e):
-        print("mousePressEvent", e.globalPos())
+        pass
+        # print("mousePressEvent", e.globalPos())
 
     def initUI(self):
         self.setWindowTitle(self.title)

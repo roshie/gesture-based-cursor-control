@@ -3,6 +3,8 @@ import numpy as np
 import imutils
 import dlib
 import cv2
+import logging as log
+log.basicConfig(format='[%(levelname)s] %(message)s', level=log.DEBUG)
 from Notifier import Notifier
 
 # Model
@@ -166,13 +168,13 @@ class CursorController(Notifier):
                 self.leftClick = False
                 self.mouse_control.click("right")
                 # _Debug_
-                print("Right Click")
+                log.info("Right Click")
                 self.eye_closed_ctr = 0
         else:
             if self.leftClick:
                 self.mouse_control.click("left")
                 # _Debug_
-                print("Left Click")
+                log.info("Left Click")
                 self.leftClick = False
             self.eye_closed_ctr = 0
 

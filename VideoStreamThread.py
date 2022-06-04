@@ -6,6 +6,8 @@ from PyQt5.QtCore import QThread, Qt, pyqtSignal, pyqtSlot
 from PyQt5.QtGui import QImage, QPixmap
 from CursorController import CursorController
 from Notifier import Notifier
+import logging as log
+log.basicConfig(format='[%(levelname)s] %(message)s', level=log.DEBUG)
 
 class Thread(QThread, Notifier):
     changePixmap = pyqtSignal(QImage)
@@ -15,6 +17,7 @@ class Thread(QThread, Notifier):
         super().__init__(window)
         self.window = window
         self.mouseControls = mouseControls
+        log.info("Starting Camera...")
 
     # notifier handlers
     def changInputMode(self, val):
@@ -34,7 +37,9 @@ class Thread(QThread, Notifier):
             facial_mouse.attach(self)
             
             while True:
-                if self.loading: self.loading = False
+                if self.loading: 
+                    self.loading = False
+                    log.info("Camera Started")
                 ret, frame = self.cap.read()
                 frame = facial_mouse.setFrame(frame)
 
