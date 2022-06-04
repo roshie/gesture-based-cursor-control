@@ -9,13 +9,14 @@ from Notifier import Notifier
 
 class Thread(QThread, Notifier):
     changePixmap = pyqtSignal(QImage)
-    mouseSensitivity = 5
     loading = True
 
     def __init__(self, window, mouseControls) -> None:
         super().__init__(window)
         self.window = window
         self.mouseControls = mouseControls
+
+    # notifier handlers
     def changInputMode(self, val):
         self.changeInputMode(val)
 
@@ -26,23 +27,32 @@ class Thread(QThread, Notifier):
         self.updatePercentage(val)
 
     def run(self):
-        self.cap = cv2.VideoCapture(0)
-        
-        facial_mouse = CursorController(self.mouseControls)
-        facial_mouse.attach(self)
-        
-        while True:
-            if self.loading: self.loading = False
-            ret, frame = self.cap.read()
-            frame = facial_mouse.setFrame(frame)
+        try: 
+            self.cap = cv2.VideoCapture(0)
+            
+            facial_mouse = CursorController(self.mouseControls)
+            facial_mouse.attach(self)
+            
+            while True:
+                if self.loading: self.loading = False
+                ret, frame = self.cap.read()
+                frame = facial_mouse.setFrame(frame)
 
-            if ret:
-                rgbImage = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                h, w, ch = rgbImage.shape
-                bytesPerLine = ch * w
-                convertToQtFormat = QImage(rgbImage.data, w, h, bytesPerLine, QImage.Format_RGB888)
-                p = convertToQtFormat.scaled(self.window.width//2, self.window.height, Qt.KeepAspectRatio)
-                self.changePixmap.emit(p)
+                if ret:
+                    rgbImage = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                    h, w, ch = rgbImage.shape
+                    bytesPerLine = ch * w
+                    convertToQtFormat = QImage(rgbImage.data, w, h, bytesPerLine, QImage.Format_RGB888)
+                    p = convertToQtFormat.scaled(self.window.width//2, self.window.height, Qt.KeepAspectRatio)
+                    self.changePixmap.emit(p)
+
+        except Exception as e:
+            print(e)
+
+    def terminate(self) -> None:
+        cv2.destroyAllWindows()
+        self.cap.release()
+        return super().terminate()
                 
     def __del__(self):
         # Destroy 
