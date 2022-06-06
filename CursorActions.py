@@ -21,11 +21,11 @@ class CursorActions():
         self.windowQueue = []
 
     def enterCharacter(self, char):
-        if not len(self.windowQueue):
+        lastFocussedWindow = self.windowQueue[-1]
+        if not len(self.windowQueue) or not len(pyag.getWindowsWithTitle(lastFocussedWindow)):
             log.debug("No Window is focussed")
             return
         
-        lastFocussedWindow = self.windowQueue[-1]
         commands = {
             'Space': ' ',
             'Enter': 'enter',
@@ -40,7 +40,7 @@ class CursorActions():
             return
 
         splChars = lambda char : char == "?" or char == "." or char == "@" or char == "," 
-        Num = lambda char : ord(char) >= 48 and ord(char) <= 5 
+        Num = lambda char : ord(char) >= 48 and ord(char) <= 58 
         uppercase = lambda char: ord(char) >= 65 and ord(char) <= 90
 
         if splChars(char) or Num(char):
