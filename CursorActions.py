@@ -1,4 +1,3 @@
-from turtle import pos
 import pyautogui as pyag
 import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
@@ -6,10 +5,7 @@ from pygame import mixer
 import logging as log
 log.basicConfig(format='[%(levelname)s] %(message)s', level=log.DEBUG)
 
-from GlobalVars import CAM_WINDOW_HEIGHT, CAM_WINDOW_WIDTH
-
-# Import Click sound
-clickSound = 'sounds/MouseClick.mp3'
+from GlobalVars import CLICK_SOUND, WINDOW_TITLES
 
 class CursorActions():
     """
@@ -21,45 +17,40 @@ class CursorActions():
         self.drag = 15 + drag # values - 0 to 10
         self.scrollOffset = scrollOffset
         mixer.init()
-        self.clickQueue = []
+        # self.clickQueue = []
+        self.windowQueue = []
 
     def enterCharacter(self, char):
-        if not len(self.clickQueue):
-            log.debug("No Textfield is focussed")
+        if not len(self.windowQueue):
+            log.debug("No Window is focussed")
             return
-
-        x,y = self.clickQueue[-1]
         
+        lastFocussedWindow = self.windowQueue[-1]
         commands = {
             'Space': ' ',
             'Enter': 'enter',
             'Backspace': 'backspace',
         }
-        currentMousePosX, currentMousePosY = pyag.position()
-        pyag.click(x=x, y=y)
+        
         if char in commands.keys():
             if char == "Space":
-                pyag.hotkey('space')
+                pyag.getWindowsWithTitle(lastFocussedWindow)[0].activate(); pyag.hotkey('space')
             else:
-                pyag.press(commands[char])
+                pyag.getWindowsWithTitle(lastFocussedWindow)[0].activate(); pyag.press(commands[char])
             return
 
-        splChars = lambda char : char == "?" or char == "." or char == ";" or char == ","
-        Num = lambda char : ord(char) >= 48 and ord(char) <= 57
+        splChars = lambda char : char == "?" or char == "." or char == "@" or char == "," 
+        Num = lambda char : ord(char) >= 48 and ord(char) <= 5 
         uppercase = lambda char: ord(char) >= 65 and ord(char) <= 90
 
         if splChars(char) or Num(char):
-            pyag.press(char)
+            pyag.getWindowsWithTitle(lastFocussedWindow)[0].activate(); pyag.press(char)
         elif uppercase(char):
-            pyag.press(chr(ord(char)+32)) 
-        # Debug
-        else:
-            log.debug(f"invalid input: {char}")
-            pyag.moveTo(currentMousePosX, currentMousePosY)
-            return
+            pyag.getWindowsWithTitle(lastFocussedWindow)[0].activate(); pyag.press(chr(ord(char)+32))
         self.playSound()
-        log.debug("Character %s entered at Position %s, %s", char, x, y)
-        pyag.moveTo(currentMousePosX, currentMousePosY)
+        log.debug("Character %s hit on %s", char, lastFocussedWindow)
+
+
         
     def moveMouse(self, direction: str):
         if direction == 'right':
@@ -83,27 +74,27 @@ class CursorActions():
 
     def click(self, button: str):
         pyag.click(button=button)
-        self.recordClick(pyag.position())
+        self.recordClick()
         self.playSound()
 
-    def recordClick(self, position, dimension=None):
-        x, y = position
+    def recordClick(self):
+        try:
+            currentWindowName = pyag.getActiveWindow().title
+        except Exception as e:
+            print("line 112:",e)
+        if currentWindowName not in WINDOW_TITLES:
+            self.windowQueue.append(currentWindowName)
 
-        if not dimension: 
-            dimension = self.screenWidth()-(self.screenWidth() * CAM_WINDOW_WIDTH), self.screenWidth() - (self.screenHeight() * CAM_WINDOW_HEIGHT)
+            if len(self.windowQueue) > 5:
+                self.windowQueue.pop(0)
 
-            log.debug("Window Dimension (%s, %s)", dimension[0], dimension[1])
-            
-            if x < dimension[0] and y < dimension[1]:
+            log.debug(f"Clicked on {currentWindowName}")
 
-                self.clickQueue.append((x,y))
-                if len(self.clickQueue) > 5:
-                    self.clickQueue.pop(0)
-        
-            log.debug("Front element in Click queue is (%s, %s)", self.clickQueue[-1][0], self.clickQueue[-1][1])
+        else:
+            log.debug("Clicked on its own app")
     
     def playSound(self):
-        mixer.music.load(clickSound)
+        mixer.music.load(CLICK_SOUND)
         mixer.music.play()
 
     def screenWidth(self) -> int:

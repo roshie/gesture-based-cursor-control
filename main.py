@@ -2,8 +2,8 @@ import sys
 from PyQt5.QtWidgets import  QWidget, QLabel, QApplication, QDesktopWidget, QPushButton, QGridLayout, QSlider, QHBoxLayout, QVBoxLayout
 from PyQt5 import QtCore
 from PyQt5.QtCore import pyqtSlot, Qt, QRect
-from PyQt5.QtGui import QImage, QPixmap, QFont
-from GlobalVars import CAM_WINDOW_HEIGHT, CAM_WINDOW_WIDTH, SYS_FONT_SIZE
+from PyQt5.QtGui import QImage, QPixmap, QMovie
+from GlobalVars import CAM_WINDOW_HEIGHT, CAM_WINDOW_WIDTH, LOADER_GIF, SYS_FONT_SIZE
 from CursorActions import CursorActions
 from VideoStreamThread import Thread
 from qt_material import apply_stylesheet
@@ -180,11 +180,14 @@ class CamWindow(QWidget):
         # create a label
         self.imageLabel = QLabel(self)
         self.videoStreamThread = Thread(self, self.mouseControls)
+        # self.movie = QMovie(LOADER_GIF)
+        # self.imageLabel.setMovie(self.movie)
         self.imageLabel.setText("Loading...")
         self.imageLabel.setStyleSheet(self.getFontSize(2))
         self.videoStreamThread.changePixmap.connect(self.setImage)
         self.videoStreamThread.attach(self)
         self.videoStreamThread.start()
+        # self.movie.start()
 
         self.eyebrowLiftPercent = QLabel("")
         self.eyebrowLiftPercent.setStyleSheet(self.getFontSize(2))

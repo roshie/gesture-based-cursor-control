@@ -39,6 +39,7 @@ class Thread(QThread, Notifier):
             while True:
                 if self.loading: 
                     self.loading = False
+                    # self.window.movie.stop()
                     log.info("Camera Started")
                 ret, frame = self.cap.read()
                 frame = facial_mouse.setFrame(frame)
@@ -52,7 +53,7 @@ class Thread(QThread, Notifier):
                     self.changePixmap.emit(p)
 
         except Exception as e:
-            print(e)
+            print("VideoStreamThread.py, line 56", e)
 
     def terminate(self) -> None:
         cv2.destroyAllWindows()

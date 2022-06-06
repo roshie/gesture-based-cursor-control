@@ -1,9 +1,6 @@
 import sys
 from PyQt5.QtWidgets import  QWidget, QLabel, QApplication, QDesktopWidget, QPushButton, QGridLayout, QSlider, QHBoxLayout, QVBoxLayout
 from PyQt5.QtCore import pyqtSlot, Qt, QRect
-from PyQt5.QtGui import QImage, QPixmap, QFont
-from VideoStreamThread import Thread
-from qt_material import apply_stylesheet
 
 class HelpWindow(QWidget):
     def __init__(self, fontSize):
@@ -25,8 +22,7 @@ class HelpWindow(QWidget):
     def initUI(self):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
-        self.resize(self.width, self.height)
-
+        self.resize(self.width, self.height) 
         self.label1 = QLabel(self)
         self.label1.setText("""
         Input mode Activate / Deactivate:

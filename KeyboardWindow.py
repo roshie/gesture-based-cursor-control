@@ -6,13 +6,16 @@ class KeyboardBtn(QPushButton):
     def __init__(self, char, window):
         super().__init__(char, window) 
         self.keyboardWindow = window
-        # windowDimension = (self.keyboardWindow.width, self.keyboardWindow.height)
+        self.char = char
         self.setStyleSheet(f"font-size: {int(self.keyboardWindow.fontSize*1.5)}px; padding-left: 5px; padding-right: 5px; padding-top: 1px; padding-bottom: 1px;")
         
         try: 
-            self.clicked.connect(self.keyboardWindow.mousecontrols.enterCharacter(char))  
+            self.clicked.connect(self.click)  
         except TypeError as e:
             print("line 15: ", e)
+
+    def click(self):
+        self.keyboardWindow.mousecontrols.enterCharacter(self.char) 
 
 class KeyboardWindow(QWidget):
     def __init__(self, mouseControls, fontSize):
@@ -68,7 +71,7 @@ class KeyboardWindow(QWidget):
         btnJ = KeyboardBtn("J", self)
         btnK = KeyboardBtn("K", self)
         btnL = KeyboardBtn("L", self)
-        btnColon = KeyboardBtn(";", self)
+        btnColon = KeyboardBtn("@", self)
 
         btnZ = KeyboardBtn("Z", self)
         btnX = KeyboardBtn("X", self)

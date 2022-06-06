@@ -11,8 +11,8 @@ from Notifier import Notifier
 SHAPE_PREDICTOR = "model/landmark_predictor.dat"
 
 # Threshold values and Frames
-SHORT_BLINK_FRAMES = 5
-LONG_BLINK_FRAMES = 10
+SHORT_BLINK_FRAMES = 3
+LONG_BLINK_FRAMES = 5
 EYEBROW_LIFT_FRAMES = 5
 LONG_EYEBROW_LIFT_FRAMES = 10
 EYEBROW_THRESH = 0.45
