@@ -21,10 +21,10 @@ class CursorActions():
         self.windowQueue = []
 
     def enterCharacter(self, char):
-        lastFocussedWindow = self.windowQueue[-1]
-        if not len(self.windowQueue) or not len(pyag.getWindowsWithTitle(lastFocussedWindow)):
+        if not len(self.windowQueue) or not len(self.windowQueue[-1]):
             log.debug("No Window is focussed")
             return
+        lastFocussedWindow = self.windowQueue[-1]
         
         commands = {
             'Space': ' ',
