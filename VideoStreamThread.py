@@ -53,9 +53,10 @@ class Thread(QThread, Notifier):
                     self.changePixmap.emit(p)
 
         except Exception as e:
-            print("VideoStreamThread.py, line 56", e)
+            log.error("Line 56, %s",str(e))
 
     def terminate(self) -> None:
+        log.info("Camera Off")
         cv2.destroyAllWindows()
         self.cap.release()
         return super().terminate()
