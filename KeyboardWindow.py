@@ -1,6 +1,8 @@
 
 from PyQt5.QtCore import pyqtSlot, Qt, QRect
 from PyQt5.QtWidgets import  QWidget, QLabel, QApplication, QDesktopWidget, QPushButton, QGridLayout
+import logging as log
+log.basicConfig(format='[%(levelname)s] %(message)s', level=log.DEBUG)
 
 class KeyboardBtn(QPushButton):
     def __init__(self, char, window):
@@ -12,7 +14,7 @@ class KeyboardBtn(QPushButton):
         try: 
             self.clicked.connect(self.click)  
         except TypeError as e:
-            print("line 15: ", e)
+            log.error("line 15: %s", str(e))
 
     def click(self):
         self.keyboardWindow.mousecontrols.enterCharacter(self.char) 

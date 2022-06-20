@@ -81,7 +81,7 @@ class CursorActions():
         try:
             currentWindowName = pyag.getActiveWindow().title
         except Exception as e:
-            print("line 112:",e)
+            log.error("line 112: %s",str(e))
         if currentWindowName not in WINDOW_TITLES:
             self.windowQueue.append(currentWindowName)
 
