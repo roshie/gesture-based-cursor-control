@@ -52,25 +52,25 @@ class CursorActions():
 
 
         
-    def moveMouse(self, direction: str):
+    def moveMouse(self, direction: str, boost: int):
         if direction == 'right':
-            pyag.moveRel(self.drag, 0)
+            pyag.moveRel(self.drag*boost, 0)
         elif direction == 'left':
-            pyag.moveRel(-self.drag, 0)
+            pyag.moveRel(-self.drag*boost, 0)
         elif direction == 'up':
-            pyag.moveRel(0, -self.drag)
+            pyag.moveRel(0, -self.drag*boost)
         elif direction == 'down':
-            pyag.moveRel(0, self.drag)
+            pyag.moveRel(0, self.drag*boost)
                 
-    def scrollVertically(self, direction: str):
+    def scrollVertically(self, direction: str, boost: int):
         if direction == 'right':
-            pyag.moveRel(self.drag, 0)
+            pyag.moveRel(self.drag*boost, 0)
         elif direction == 'left':
-            pyag.moveRel(-self.drag, 0)
+            pyag.moveRel(-self.drag*boost, 0)
         elif direction == 'up':
-            pyag.scroll(self.scrollOffset)
+            pyag.scroll(self.scrollOffset*boost)
         elif direction == 'down':
-            pyag.scroll(-self.scrollOffset)
+            pyag.scroll(-self.scrollOffset*boost)
 
     def click(self, button: str):
         pyag.click(button=button)

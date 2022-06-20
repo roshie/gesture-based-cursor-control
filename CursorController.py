@@ -190,14 +190,14 @@ class CursorController(Notifier):
             cv2.rectangle(frame, (x - w, y - h), (x + w, y + h), RED_COLOR, 5)
             cv2.line(frame, self.anchor_point, nose_point, RED_COLOR, 5)
 
-            _direction = self.direction(nose_point, self.anchor_point, w, h)
+            _direction, boost = self.direction(nose_point, self.anchor_point, w, h)
             # _Debug_
             # self.show_debug_texts(frame, _direction.upper(), (600, 750), RED_COLOR)
 
             if self.scroll_mode:
-                self.mouse_control.scrollVertically(_direction)
+                self.mouse_control.scrollVertically(_direction, boost)
             else:
-                self.mouse_control.moveMouse(_direction)
+                self.mouse_control.moveMouse(_direction, boost)
 
         else:
             self.toggleScrollMode(False)
@@ -289,18 +289,35 @@ class CursorController(Notifier):
     def direction(self, nose_point, anchor_point, w, h, multiple=1):
         nx, ny = nose_point
         x, y = anchor_point
+        boost = 1
+        direction = 'none'
+
+        diffX = abs(x-nx)
+        diffY = abs(y-ny)
+
+        if diffX > diffY:
+            boost = diffX // w
+            if boost > 1:
+                boost = diffX // (w*2)
+        else:
+            boost = diffY // h
+            if boost > 1:
+                boost = diffY // (h*2)
+
+        if boost > 3:
+            boost = 3
 
         if nx > x + multiple * w:
-            return 'right'
+            direction = 'right'
         elif nx < x - multiple * w:
-            return 'left'
+            direction = 'left'
 
         if ny > y + multiple * h:
-            return 'down'
+            direction = 'down'
         elif ny < y - multiple * h:
-            return 'up'
+            direction = 'up'
 
-        return 'none'
+        return direction, boost
 
     def show_debug_texts(self, frame, message, coord, color):
         cv2.putText(frame, message, coord, cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
