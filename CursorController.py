@@ -324,4 +324,5 @@ class CursorController(Notifier):
     
     def __del__(self):
         # Destroy 
+        log.debug("__del__() called at CursorController.py")
         cv2.destroyAllWindows()

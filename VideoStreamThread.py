@@ -56,12 +56,13 @@ class Thread(QThread, Notifier):
             log.error("Line 56, %s",str(e))
 
     def terminate(self) -> None:
-        log.info("Camera Off")
+        log.debug("terminate() called at VideoStreamThread.py")
         cv2.destroyAllWindows()
         self.cap.release()
         return super().terminate()
                 
     def __del__(self):
         # Destroy 
+        log.debug("__del__() called at VideoStreamThread.py")
         cv2.destroyAllWindows()
         self.cap.release()
