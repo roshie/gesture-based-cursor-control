@@ -8,7 +8,7 @@ a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[('model/landmark_predictor.dat', 'model')],
-    datas=[( 'assets/MouseClick.mp3', 'assets' )],
+    datas=[('assets/MouseClick.mp3', 'assets')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

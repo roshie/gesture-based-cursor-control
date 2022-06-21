@@ -22,10 +22,10 @@ class CursorActions():
         self.windowQueue = []
 
     def enterCharacter(self, char):
-        if not len(self.windowQueue) or not len(self.windowQueue[-1]):
+        if not len(self.windowQueue) or not len(self.windowQueue[-1]) or (len(self.windowQueue) == 1 and self.windowQueue[-1] == "Search"):
             log.debug("No Window is focussed")
             return
-        lastFocussedWindow = self.windowQueue[-1]
+        lastFocussedWindow = self.windowQueue[-1] if self.windowQueue[-1] != "Search" else self.windowQueue[-2]
         
         commands = {
             'Space': ' ',
@@ -86,20 +86,25 @@ class CursorActions():
         self.playSound()
 
     def recordClick(self):
-        try:
-            currentWindowName = pyag.getActiveWindow().title
-        except Exception as e:
-            log.error("line 112: %s",str(e))
-        if currentWindowName not in WINDOW_TITLES:
-            self.windowQueue.append(currentWindowName)
+        if pyag.getActiveWindow():
+            try:
+                currentWindowName = pyag.getActiveWindow().title
+                if currentWindowName.strip() == "":
+                    currentWindowName = "Taskbar"
 
-            if len(self.windowQueue) > 5:
-                self.windowQueue.pop(0)
+            except Exception as e:
+                log.error("line 112: %s",str(e))
 
-            log.debug(f"Clicked on {currentWindowName}")
+            if currentWindowName not in WINDOW_TITLES and currentWindowName != "Taskbar":
+                self.windowQueue.append(currentWindowName)
 
-        else:
-            log.debug("Clicked on its own app")
+                if len(self.windowQueue) > 5:
+                    self.windowQueue.pop(0)
+
+                log.debug(f"Clicked on **{currentWindowName}**")
+
+            else:
+                log.debug("Clicked on its own Window")
     
     def playSound(self):
         mixer.music.load(get_resource_path(CLICK_SOUND))
