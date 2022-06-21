@@ -125,6 +125,7 @@ class CamWindow(QWidget):
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
         pg = QDesktopWidget().availableGeometry()
         self.fontSize = int(pg.height()*SYS_FONT_SIZE)
+        self.keyboard = None
         self.initUI()
 
     def getFontSize(self, scale) -> str:
@@ -153,8 +154,12 @@ class CamWindow(QWidget):
         self.intro.show()
 
     def openKeyboard(self):
-        self.keyboard = KeyboardWindow(self.mouseControls, self.fontSize)
-        self.keyboard.show()
+        if self.keyboard is None:
+            self.keyboard = KeyboardWindow(self.mouseControls, self.fontSize)
+            self.keyboard.show()
+        else:
+            if not self.keyboard.isKeyboardOpened:
+                self.keyboard.show()
 
     def changInputMode(self, val):
         self.inputStatus.setText("OFF" if not val else "ON")
@@ -259,6 +264,9 @@ class CamWindow(QWidget):
         self.location_on_the_screen()
         self.show()
         
+    def closeEvent(self, a0):
+        if self.keyboard is not None: self.keyboard.close()
+
 if __name__ == '__main__':
     log.info("Initializing application...")
     app = QApplication(sys.argv)

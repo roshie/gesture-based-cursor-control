@@ -31,6 +31,7 @@ class KeyboardWindow(QWidget):
         self.height = pg.height()//4
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.mousecontrols = mouseControls
+        self.isKeyboardOpened = False
         self.initUI()
 
     def mousePressEvent(self, e):
@@ -148,6 +149,7 @@ class KeyboardWindow(QWidget):
         self.setLayout(grid)
 
         self.location_on_the_screen()
+        self.isKeyboardOpened = True
         self.show()
 
     def location_on_the_screen(self):
@@ -158,3 +160,6 @@ class KeyboardWindow(QWidget):
         x = ag.width() - widget.width()
         y = 2 * ag.height() - sg.height() - widget.height()
         self.move(x, y)
+
+    def closeEvent(self, a0):
+        self.isKeyboardOpened = False
