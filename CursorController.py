@@ -6,9 +6,10 @@ import cv2
 import logging as log
 log.basicConfig(format='[%(levelname)s] %(message)s', level=log.DEBUG)
 from Notifier import Notifier
+from utils import get_resource_path
 
 # Model
-SHAPE_PREDICTOR = "model/landmark_predictor.dat"
+SHAPE_PREDICTOR = get_resource_path("model\landmark_predictor.dat")
 
 # Threshold values and Frames
 SHORT_BLINK_FRAMES = 3
@@ -27,13 +28,6 @@ GREEN_COLOR = (0, 255, 0)
 BLUE_COLOR = (255, 0, 0)
 BLACK_COLOR = (0, 0, 0)
 TEAL_COLOR = (0, 220, 220)
-
-# Grab the landmark indexes (default)
-# (lStart, lEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
-# (lbStart, lbEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eyebrow"]
-# (rStart, rEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
-# (rbStart, rbEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eyebrow"]
-# (nStart, nEnd) = face_utils.FACIAL_LANDMARKS_IDXS["nose"]
 
 # Grab the landmark indexes (custom model indexes)
 lbStart, lbEnd = 0, 5
@@ -121,7 +115,7 @@ class CursorController(Notifier):
         nose_point = nose
 
         # Mark the Landmarks
-        self.mark_landmarks(coordinates, frame)
+        # self.mark_landmarks(coordinates, frame)
 
         # if Eye is opened 
         if ear > EYE_AR_LIFT_THRESH:
@@ -179,9 +173,6 @@ class CursorController(Notifier):
             self.eye_closed_ctr = 0
 
         if self.input_mode:
-            # _Debug_
-            # self.show_debug_texts(frame, "READING INPUT!", (20, 750), GREEN_COLOR)
-            # self.show_debug_texts(frame, f"{'' if self.eyebrow_lift_ctr == 0 else self.eyebrow_lift_ctr}", (20, 780), GREEN_COLOR)
 
             x, y = self.anchor_point
             w, h = 40, 25
@@ -191,8 +182,6 @@ class CursorController(Notifier):
             cv2.line(frame, self.anchor_point, nose_point, RED_COLOR, 5)
 
             _direction, boost = self.direction(nose_point, self.anchor_point, w, h)
-            # _Debug_
-            # self.show_debug_texts(frame, _direction.upper(), (600, 750), RED_COLOR)
 
             if self.scroll_mode:
                 self.mouse_control.scrollVertically(_direction, boost)
@@ -201,18 +190,11 @@ class CursorController(Notifier):
 
         else:
             self.toggleScrollMode(False)
-            # _Debug_
-            # self.show_debug_texts(frame, "INPUT MODE OFF", (20, 750), RED_COLOR)
-            # self.show_debug_texts(frame, f"LIFT YOUR EYEBROWS FOR 3s TO TURN ON. {'' if self.eyebrow_lift_ctr == 0 else self.eyebrow_lift_ctr}", (20, 780), RED_COLOR)
             
         if self.scroll_mode:
             pass
-            # _Debug_
-            # self.show_debug_texts(frame, "SCROLL MODE ON", (300, 750), GREEN_COLOR)
 
         return frame
-
-    
 
     # utility functions
     def extract_coordinates(self, shape):
@@ -228,13 +210,13 @@ class CursorController(Notifier):
 
         return leftEye, rightEye, leftBrow, rightBrow, nose
 
-    def mark_landmarks(self, coordinates, frame):
+    # def mark_landmarks(self, coordinates, frame):
         # Compute the convex hull for the left and right eye, then
         # visualize each of the eyes
-        leftBrowHull = cv2.convexHull(coordinates[2])
-        rightBrowHull = cv2.convexHull(coordinates[3])
-        leftEyeHull = cv2.convexHull(coordinates[0])
-        rightEyeHull = cv2.convexHull(coordinates[1])
+        # leftBrowHull = cv2.convexHull(coordinates[2])
+        # rightBrowHull = cv2.convexHull(coordinates[3])
+        # leftEyeHull = cv2.convexHull(coordinates[0])
+        # rightEyeHull = cv2.convexHull(coordinates[1])
         # cv2.drawContours(frame, [leftBrowHull], -1, YELLOW_COLOR, 4)
         # cv2.drawContours(frame, [rightBrowHull], -1, YELLOW_COLOR, 4)
         # cv2.drawContours(frame, [leftEyeHull], -1, YELLOW_COLOR, 4)

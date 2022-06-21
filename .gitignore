@@ -6,4 +6,5 @@ model/afw
 model/ibug
 model/lfpw
 model/helen
-
+dist
+build

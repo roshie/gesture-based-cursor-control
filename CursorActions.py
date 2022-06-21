@@ -6,6 +6,7 @@ import logging as log
 log.basicConfig(format='[%(levelname)s] %(message)s', level=log.DEBUG)
 
 from GlobalVars import CLICK_SOUND, WINDOW_TITLES
+from utils import get_resource_path
 
 class CursorActions():
     """
@@ -101,7 +102,7 @@ class CursorActions():
             log.debug("Clicked on its own app")
     
     def playSound(self):
-        mixer.music.load(CLICK_SOUND)
+        mixer.music.load(get_resource_path(CLICK_SOUND))
         mixer.music.play()
 
     def screenWidth(self) -> int:
