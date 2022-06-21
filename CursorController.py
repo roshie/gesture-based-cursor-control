@@ -268,7 +268,7 @@ class CursorController(Notifier):
         return eyebrow_ratio
 
     # Return direction given the nose and anchor points.
-    def direction(self, nose_point, anchor_point, w, h, multiple=1):
+    def direction(self, nose_point, anchor_point, w, h):
         nx, ny = nose_point
         x, y = anchor_point
         boost = 1
@@ -289,16 +289,25 @@ class CursorController(Notifier):
         if boost > 3:
             boost = 3
 
-        if nx > x + multiple * w:
+        diffx, diffy = 0,0
+
+        if nx > x + w:
             direction = 'right'
-        elif nx < x - multiple * w:
+            diffx = nx - (x + w)
+        elif nx < x - w:
             direction = 'left'
+            diffx = (x - w) - nx
 
-        if ny > y + multiple * h:
-            direction = 'down'
-        elif ny < y - multiple * h:
-            direction = 'up'
+        if ny > y + h:
+            diffy = ny - (y+h)
+            if diffy > diffx:
+                direction = 'down'
+        elif ny < y - h:
+            diffy = (y+h) - ny
+            if diffy > diffx:
+                direction = 'up'
 
+        
         return direction, boost
 
     def show_debug_texts(self, frame, message, coord, color):
